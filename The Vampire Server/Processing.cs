@@ -165,7 +165,12 @@ namespace The_Vampire_Server
         private void RoomExitProc(byte[] data, Socket client) {
             int _roomNumber = Int32.Parse(Encoding.Unicode.GetString(data));
             RoomInfo roomInfo = roomSet.Find(x => x.roomNumber == _roomNumber);
-            int lobbyIndex = roomSet.IndexOf(roomInfo);
+
+            if (roomInfo.owner.Equals(client))
+            {
+                foreach (Socket _client in roomInfo.users.Keys)
+                    SendDataToClient((byte)101, Encoding.Unicode.GetBytes("f"), _client);
+            }
 
             bool state = roomInfo.ExitRoom(client);
             if (state)
@@ -236,6 +241,8 @@ namespace The_Vampire_Server
 
             int result = dataManager.ExecuteUpdate(_sql);
         }
+
+        //Disconnect 시 종료처리
     }
 }
 
