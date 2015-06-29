@@ -124,7 +124,24 @@ namespace The_Vampire_Server
                         case 'F':
                             RoomEnterProc(_client);
                             break;
-
+                        case 'G':
+                            RoomChatProc(packet.Data, _client);
+                            break;
+                        case 'H':
+                            RoomExitProc(packet.Data, _client);
+                            break;
+                        case 'I':
+                            SignUpProc(packet.Data, _client);
+                            break;
+                        case 'J':
+                            ShowFriendsProc(_client);
+                            break;
+                        case 'K':
+                            AddFriendProc(packet.Data, _client);
+                            break;
+                        case 'L':
+                            DeleteFriendProc(packet.Data, _client);
+                            break;
                     }
                 }
                 catch (Exception _e)
