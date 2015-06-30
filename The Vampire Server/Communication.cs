@@ -30,12 +30,11 @@ namespace The_Vampire_Server
                 _data = Console.ReadLine();
                 if (_data.CompareTo("exit") == 0) { break; }
                 else {
-                    foreach (KeyValuePair<Socket, User> __client in clientSet)
+                    foreach (Socket _client in clientSet.Keys)
                     {
-                        Socket _client = __client.Key;
                         if (!_client.Connected)
                         {
-                            clientSet.Remove(_client);
+                            DisconnectProc(_client);
                         }
                         else
                         {
@@ -61,7 +60,7 @@ namespace The_Vampire_Server
             Packet packet = new Packet();
             if (!client.Connected)
             {
-                clientSet.Remove(client);
+                DisconnectProc(client);
             }
             else
             {
@@ -74,7 +73,15 @@ namespace The_Vampire_Server
                 client.SendAsync(_sendArgs);
             }
         }
-
+        private void DisconnectProc(Socket client)
+        {
+            if (clientSet[client].state == ClientState.ONROOM || clientSet[client].state == ClientState.ONGAME)
+            {
+                RoomInfo roomInfo = roomSet.Find(x => x.users.ContainsKey(client));
+                RoomExitProc(Encoding.Unicode.GetBytes(roomInfo.roomNumber.ToString()), client);
+            }
+            clientSet.Remove(client);
+        }
         private void Accept_Completed(object sender, SocketAsyncEventArgs e) {
             Socket _client = e.AcceptSocket;
 
@@ -124,7 +131,24 @@ namespace The_Vampire_Server
                         case 'F':
                             RoomEnterProc(_client);
                             break;
-
+                        case 'G':
+                            RoomChatProc(packet.Data, _client);
+                            break;
+                        case 'H':
+                            RoomExitProc(packet.Data, _client);
+                            break;
+                        case 'I':
+                            SignUpProc(packet.Data, _client);
+                            break;
+                        case 'J':
+                            ShowFriendsProc(_client);
+                            break;
+                        case 'K':
+                            AddFriendProc(packet.Data, _client);
+                            break;
+                        case 'L':
+                            DeleteFriendProc(packet.Data, _client);
+                            break;
                     }
                 }
                 catch (Exception _e)
@@ -145,7 +169,7 @@ namespace The_Vampire_Server
                 _client.ReceiveAsync(e);
             }
             else {
-                clientSet.Remove(_client);
+                DisconnectProc(_client);
             }
         }
         private void Send_Completed(object sender, SocketAsyncEventArgs e)

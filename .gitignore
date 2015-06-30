@@ -30,3 +30,9 @@ build/
 *.pidb
 *.log
 *.scc
+
+# Temporary file
+~$
+
+# User option
+.suo

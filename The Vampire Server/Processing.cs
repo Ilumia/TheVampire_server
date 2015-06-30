@@ -26,13 +26,11 @@ namespace The_Vampire_Server
             {
                 // 로그인 성공
                 clientSet[client] = new User(userid, ClientState.ONLOGIN);
-                Console.WriteLine("Login success: " + clientSet[client].id);
                 SendDataToClient((byte)97, Encoding.Unicode.GetBytes("s"), client);
             }
             else
             {
                 // 아이디가 없거나 비밀번호를 틀림
-                Console.WriteLine("Fail to login");
                 SendDataToClient((byte)97, Encoding.Unicode.GetBytes("f"), client);
             }
         }
@@ -89,12 +87,8 @@ namespace The_Vampire_Server
             else
                 _isPublic = false;
 
-
-            RoomInfo roomInfo = roomSet.Find(x => x.users[0].Equals(clientSet[client].id));
-            int lobbyIndex = roomSet.IndexOf(roomInfo);
-            roomInfo.maximumNumber = _maximumNumber;
-            roomInfo.isPublic = _isPublic;
-            roomSet[lobbyIndex] = roomInfo;
+            RoomInfo roomInfo = roomSet.Find(x => x.owner.Equals(client));
+            roomInfo.ConfigRoom(_maximumNumber, _isPublic);
 
             RoomUpdateProc(roomInfo);
         }
@@ -102,9 +96,9 @@ namespace The_Vampire_Server
         {
             int _roomNumber = Int32.Parse(Encoding.Unicode.GetString(data));
             RoomInfo roomInfo = roomSet.Find(x => x.roomNumber == _roomNumber);
-            int lobbyIndex = roomSet.IndexOf(roomInfo);
 
-            bool state = roomInfo.JoinRoom(client);
+            bool state = roomInfo.JoinRoom(client, clientSet[client].id);
+
             string _data = "";
             if (state)
             {
@@ -137,14 +131,15 @@ namespace The_Vampire_Server
                 _data += "t ";
             else
                 _data += "f ";
-            foreach (string _userId in roomInfo.users)
+            foreach (string _userId in roomInfo.users.Values)
             {
                 if (_userId != null)
                 {
                     _data += _userId + " ";
                 }
             }
-            foreach (Socket _client in roomInfo.clients)
+            Console.WriteLine(_data);
+            foreach (Socket _client in roomInfo.users.Keys)
             {
                 if (_client != null)
                 {
@@ -152,6 +147,102 @@ namespace The_Vampire_Server
                 }
             }
         }
+        private void RoomChatProc(byte[] data, Socket client) {
+            string chat = Encoding.Unicode.GetString(data);
+            string separator = "\r\n";
+            string _data = clientSet[client].id + separator + chat;
+
+            RoomInfo roomInfo = roomSet.Find(x => x.users.ContainsKey(client));
+
+            foreach (Socket _client in roomInfo.users.Keys)
+            {
+                if (_client != null)
+                {
+                    SendDataToClient((byte)102, Encoding.Unicode.GetBytes(_data), _client);
+                }
+            }
+        }
+        private void RoomExitProc(byte[] data, Socket client) {
+            int _roomNumber = Int32.Parse(Encoding.Unicode.GetString(data));
+            RoomInfo roomInfo = roomSet.Find(x => x.roomNumber == _roomNumber);
+
+            if (roomInfo.owner.Equals(client))
+            {
+                foreach (Socket _client in roomInfo.users.Keys)
+                    SendDataToClient((byte)101, Encoding.Unicode.GetBytes("f"), _client);
+            }
+
+            bool state = roomInfo.ExitRoom(client);
+            if (state)
+            {
+                clientSet[client] = new User(clientSet[client].id, ClientState.ONLOBBY);
+                RoomUpdateProc(roomInfo);
+            }
+        }
+        private void SignUpProc(byte[] data, Socket client)
+        {
+            DataManager dataManager = DataManager.GetDataManager();
+
+            string _tempString = Encoding.Unicode.GetString(data);
+            string[] _tempStringArray = _tempString.Split(' ');
+            string userid = _tempStringArray[0];
+            string userpassword = _tempStringArray[1];
+
+            string _sql = "INSERT INTO users VALUES ('" + userid + "', '" + userpassword + "', NULL)";
+            int result = dataManager.ExecuteUpdate(_sql);
+            if (result == 1)
+                SendDataToClient((byte)103, Encoding.Unicode.GetBytes("t"), client);
+            else
+                SendDataToClient((byte)103, Encoding.Unicode.GetBytes("f"), client);
+        }
+        private void ShowFriendsProc(Socket client)
+        {
+            DataManager dataManager = DataManager.GetDataManager();
+            DataTable dataTable;
+
+            string _sql = "SELECT friendid FROM friends WHERE userid = '" + clientSet[client].id + "'";
+            dataTable = dataManager.ExecuteQuery(_sql);
+
+            string _data = "";
+            foreach (DataRow item in dataTable.Rows)
+            {
+                _data += item.ItemArray[0].ToString() + " ";
+            }
+            SendDataToClient((byte)104, Encoding.Unicode.GetBytes(_data), client);
+        }
+        private void AddFriendProc(byte[] data, Socket client)
+        {
+            DataManager dataManager = DataManager.GetDataManager();
+            string friendid = Encoding.Unicode.GetString(data);
+            if (friendid.Equals(clientSet[client].id))
+            {
+                SendDataToClient((byte)105, Encoding.Unicode.GetBytes("f 1"), client);
+                return;
+            }
+
+            string _sql = "INSERT INTO friends VALUES ('" + clientSet[client].id + "', '" + friendid + "')";
+
+            int result = dataManager.ExecuteUpdate(_sql);
+            if (result == 1)
+            {
+                SendDataToClient((byte)105, Encoding.Unicode.GetBytes("t"), client);
+            }
+            else
+            {
+                SendDataToClient((byte)105, Encoding.Unicode.GetBytes("f"), client);
+            }
+        }
+        private void DeleteFriendProc(byte[] data, Socket client)
+        {
+            DataManager dataManager = DataManager.GetDataManager();
+            string friendid = Encoding.Unicode.GetString(data);
+
+            string _sql = "DELETE FROM friends WHERE userid = '" + clientSet[client].id + "' and friendid = '" + friendid + "'";
+
+            int result = dataManager.ExecuteUpdate(_sql);
+        }
+
+        //Disconnect 시 종료처리
     }
 }
 

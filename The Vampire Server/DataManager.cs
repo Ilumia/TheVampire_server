@@ -45,7 +45,7 @@ namespace The_Vampire_Server
         }
 
         // 처리된 행의 갯수를 반환 (-1: error)
-        public int ExcuteUpdate(string _sql)
+        public int ExecuteUpdate(string _sql)
         {
             int result = -1;
             using (SqlConnection connection = new SqlConnection(connectionString))

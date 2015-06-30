@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 
 namespace The_Vampire_Server
@@ -60,55 +61,48 @@ namespace The_Vampire_Server
         public int totalNumber;
         public int maximumNumber;
         public bool isPublic;
-        public string[] users;
-        public Socket[] clients;
+        public Dictionary<Socket, string> users;
+        public Socket owner;
+        //public string[] users;
+        //public Socket[] clients;
 
-        public RoomInfo(Socket director, string directoId, int _maximumNumber, bool _isPublic)
+        public RoomInfo(Socket _owner, string _ownerId, int _maximumNumber, bool _isPublic)
         {
             roomNumber = nextRoomNumber;
             nextRoomNumber++;
-            clients = new Socket[_maximumNumber];
-            clients[0] = director;
-            users = new string[_maximumNumber];
-            users[0] = directoId;
+            users = new Dictionary<Socket, string>();
+            users.Add(_owner, _ownerId);
+            owner = _owner;
             totalNumber = 1;
             maximumNumber = _maximumNumber;
             isPublic = _isPublic;
-
-            PrintLobbyState();
         }
 
-        public bool JoinRoom(Socket client)
+        public bool ConfigRoom(int _maximumNumber, bool _isPublic)
+        {
+            if (totalNumber > _maximumNumber)
+            {
+                return false;
+            }
+            maximumNumber = _maximumNumber;
+            isPublic = _isPublic;
+            return true;
+        }
+
+        public bool JoinRoom(Socket client, string clientid)
         {
             if (totalNumber < maximumNumber)
             {
-                for (int i = 0; i < maximumNumber; i++)
-                {
-                    if (clients[i] == null)
-                    {
-                        clients[i] = client;
-                        return true;
-                    }
-                }
+                users.Add(client, clientid);
+                totalNumber++;
             }
-            return false;
+            return true;
         }
         public bool ExitRoom(Socket client)
         {
-            for (int i = 0; i < totalNumber; i++)
-            {
-                if (clients[i] == client)
-                {
-                    clients[i] = null;
-                    return true;
-                }
-            }
-                return false;
-        }
-
-        private void PrintLobbyState()
-        {
-            Console.WriteLine("no." + roomNumber + ", next: " + nextRoomNumber + ", director: " + clients[0].RemoteEndPoint);
+            users.Remove(client);
+            totalNumber--;
+            return true;
         }
     }
 }
