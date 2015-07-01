@@ -33,3 +33,6 @@ build/
 
 # Temporary file
 ~$
+
+#Solution User Option
+.suo

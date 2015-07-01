@@ -79,8 +79,13 @@ namespace The_Vampire_Server
             {
                 RoomInfo roomInfo = roomSet.Find(x => x.users.ContainsKey(client));
                 RoomExitProc(Encoding.Unicode.GetBytes(roomInfo.roomNumber.ToString()), client);
+                foreach (Socket _user in roomInfo.users.Keys)
+                {
+                    clientSet[_user] = new User(clientSet[_user].id, ClientState.ONLOBBY);
+                }
             }
             clientSet.Remove(client);
+
         }
         private void Accept_Completed(object sender, SocketAsyncEventArgs e) {
             Socket _client = e.AcceptSocket;
