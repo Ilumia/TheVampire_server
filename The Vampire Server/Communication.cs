@@ -154,6 +154,15 @@ namespace The_Vampire_Server
                         case 'L':
                             DeleteFriendProc(packet.Data, _client);
                             break;
+
+
+                        /* 미구현 */
+                        case 'Y':
+                            //MonitorProc(packet.Data, _client);
+                            break;
+                        case 'Z':
+                            //NoticeProc(packet.Data, _client);
+                            break;
                     }
                 }
                 catch (Exception _e)
@@ -163,8 +172,9 @@ namespace The_Vampire_Server
                     SendDataToClient((byte)122, new byte[0], _client);
                 }
 
-                Console.WriteLine("Recv type: {0}, from: {1}", (char)packet.Type, clientIP);
-                Console.WriteLine("Data: {0}", Encoding.Unicode.GetString(packet.Data));
+                Console.WriteLine("===================================");
+                Console.WriteLine("Recv Type: {0}, from: {1}", (char)packet.Type, clientIP);
+                Console.WriteLine("Recv Data: {0}", Encoding.Unicode.GetString(packet.Data));
             }
             else
             {
@@ -184,7 +194,8 @@ namespace The_Vampire_Server
             _client.Send(packet.DataBuffer);
 
             IPEndPoint clientIP = _client.RemoteEndPoint as IPEndPoint;
-            Console.WriteLine("Send: {0}, to: {1}", Encoding.Unicode.GetString(packet.Data), clientIP);
+            Console.WriteLine("Send Type: {0}, to: {1}", (char)packet.Type, clientIP);
+            Console.WriteLine("Send Data: {0}", Encoding.Unicode.GetString(packet.Data));
         }
     }
 }
