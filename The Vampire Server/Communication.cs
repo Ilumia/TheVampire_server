@@ -156,17 +156,18 @@ namespace The_Vampire_Server
                             break;
 
 
-                        /* 미구현 */
                         case 'Y':
-                            //MonitorProc(packet.Data, _client);
+                            MonitorProc(packet.Data, _client);
                             break;
                         case 'Z':
-                            //NoticeProc(packet.Data, _client);
+                            NoticeProc(packet.Data, _client);
                             break;
                     }
                 }
                 catch (Exception _e)
                 {
+                    errors += _e.Message + "\n";
+                    errors += _e.StackTrace + "\n\n";
                     Console.WriteLine(_e.Message);
                     Console.WriteLine(_e.StackTrace);
                     SendDataToClient((byte)122, new byte[0], _client);

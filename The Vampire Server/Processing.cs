@@ -191,7 +191,7 @@ namespace The_Vampire_Server
             string _sql = "INSERT INTO users VALUES ('" + userid + "', '" + userpassword + "', NULL)";
             int result = dataManager.ExecuteUpdate(_sql);
             if (result == 1)
-                SendDataToClient((byte)103, Encoding.Unicode.GetBytes("t"), client);
+                SendDataToClient((byte)103, Encoding.Unicode.GetBytes("s"), client);
             else
                 SendDataToClient((byte)103, Encoding.Unicode.GetBytes("f"), client);
         }
@@ -243,6 +243,43 @@ namespace The_Vampire_Server
         }
 
         //Disconnect 시 종료처리
+
+        private void MonitorProc(byte[] data, Socket client)
+        {
+            char request = (char)data[0];
+            string _data = "";
+            switch (request)
+            {
+                case 'a':
+                    _data += "a" + "$sep$";
+                    _data += clientSet.Count.ToString() + "$sep$";
+                    _data += roomSet.Count.ToString() + "$sep$";
+                    _data += errors;
+                    errors = "";
+                    break;
+                case 'c':
+                    _data += "c" + " ";
+                    _data += clientSet.Count.ToString() + " ";
+                    break;
+                case 'r':
+                    _data += "r" + " ";
+                    _data += roomSet.Count.ToString() + " ";
+                    break;
+                case 'e':
+                    _data += "e" + "$sep$";
+                    _data += errors;
+                    errors = "";
+                    break;
+            }
+            SendDataToClient((byte)120, Encoding.Unicode.GetBytes(_data), client);
+        }
+        private void NoticeProc(byte[] data, Socket client)
+        {
+            foreach (Socket _client in clientSet.Keys)
+            {
+                SendDataToClient((byte)121, data, _client);
+            }
+        }
     }
 }
 
