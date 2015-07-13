@@ -18,6 +18,7 @@ namespace The_Vampire_Server
                 for (int i = 0; i < Length - 1; i++) { temp[i] = data[i + 1]; }
                 return temp;
             }
+            set { this.data = value; }
         }
         public int Length { get { return length; } }
         public void InitSendPacket(byte type, byte[] _data)

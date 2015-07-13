@@ -29,25 +29,6 @@ namespace The_Vampire_Server
             while (true) {
                 _data = Console.ReadLine();
                 if (_data.CompareTo("exit") == 0) { break; }
-                else {
-                    foreach (Socket _client in clientSet.Keys)
-                    {
-                        if (!_client.Connected)
-                        {
-                            DisconnectProc(_client);
-                        }
-                        else
-                        {
-                            packet.InitSendPacket((byte)67, Encoding.Unicode.GetBytes(_data));
-                            SocketAsyncEventArgs _sendArgs = new SocketAsyncEventArgs();
-                            _sendArgs.SetBuffer(BitConverter.GetBytes(packet.Length), 0, 4);
-                            _sendArgs.Completed += new EventHandler<SocketAsyncEventArgs>(Send_Completed);
-                            _sendArgs.UserToken = packet;
-
-                            _client.SendAsync(_sendArgs);
-                        }
-                    }
-                }
             }
         }
 
@@ -64,6 +45,7 @@ namespace The_Vampire_Server
             }
             else
             {
+                //byte[] compressedData = CompressToBytes(data);
                 packet.InitSendPacket(type, data);
                 SocketAsyncEventArgs _sendArgs = new SocketAsyncEventArgs();
                 _sendArgs.SetBuffer(BitConverter.GetBytes(packet.Length), 0, 4);
@@ -72,6 +54,28 @@ namespace The_Vampire_Server
 
                 client.SendAsync(_sendArgs);
             }
+        }
+        private byte[] CompressToBytes(string data)
+        {
+            byte[] _data = Encoding.UTF8.GetBytes(data);
+            return _data;
+        }
+        private byte[] CompressToBytes(byte[] data)
+        {
+            string tData = Encoding.Unicode.GetString(data);
+            byte[] _data = Encoding.UTF8.GetBytes(tData);
+            return _data;
+        }
+        private string DecompressToUnicode(byte[] data)
+        {
+            string _data = Encoding.UTF8.GetString(data);
+            return _data;
+        }
+        private byte[] DecompressToBytes(byte[] data)
+        {
+            string __data = Encoding.UTF8.GetString(data);
+            byte[] _data = Encoding.Unicode.GetBytes(__data);
+            return _data;
         }
         private void DisconnectProc(Socket client)
         {
@@ -113,54 +117,60 @@ namespace The_Vampire_Server
             if (_client.Connected) {
                 _client.Receive(packet.DataBuffer, packet.Length, SocketFlags.None);
 
+                byte[] data = null;
+                if (packet.Length > 0)
+                {
+                    data = DecompressToBytes(packet.Data);
+                }
+
                 /* Classify Packet Type */
                 try
                 {
                     switch ((char)packet.Type)
                     {
                         case 'A':
-                            LoginProc(packet.Data, _client);
+                            LoginProc(data, _client);
                             break;
                         case 'B':
                             //LobbyInfoProc();
                             break;
                         case 'C':
-                            RoomCreateProc(packet.Data, _client);
+                            RoomCreateProc(data, _client);
                             break;
                         case 'D':
-                            RoomConfigProc(packet.Data, _client);
+                            RoomConfigProc(data, _client);
                             break;
                         case 'E':
-                            SpecificRoomEnterProc(packet.Data, _client);
+                            SpecificRoomEnterProc(data, _client);
                             break;
                         case 'F':
                             RoomEnterProc(_client);
                             break;
                         case 'G':
-                            RoomChatProc(packet.Data, _client);
+                            RoomChatProc(data, _client);
                             break;
                         case 'H':
-                            RoomExitProc(packet.Data, _client);
+                            RoomExitProc(data, _client);
                             break;
                         case 'I':
-                            SignUpProc(packet.Data, _client);
+                            SignUpProc(data, _client);
                             break;
                         case 'J':
                             ShowFriendsProc(_client);
                             break;
                         case 'K':
-                            AddFriendProc(packet.Data, _client);
+                            AddFriendProc(data, _client);
                             break;
                         case 'L':
-                            DeleteFriendProc(packet.Data, _client);
+                            DeleteFriendProc(data, _client);
                             break;
 
 
                         case 'Y':
-                            MonitorProc(packet.Data, _client);
+                            MonitorProc(data, _client);
                             break;
                         case 'Z':
-                            NoticeProc(packet.Data, _client);
+                            NoticeProc(data, _client);
                             break;
                     }
                 }
@@ -175,7 +185,7 @@ namespace The_Vampire_Server
 
                 Console.WriteLine("===================================");
                 Console.WriteLine("Recv Type: {0}, from: {1}", (char)packet.Type, clientIP);
-                Console.WriteLine("Recv Data: {0}", Encoding.Unicode.GetString(packet.Data));
+                Console.WriteLine("Recv Data: {0}", Encoding.Unicode.GetString(data));
             }
             else
             {
@@ -192,6 +202,7 @@ namespace The_Vampire_Server
         {
             Socket _client = (Socket)sender;
             Packet packet = (Packet)e.UserToken;
+            //packet.Data = CompressToBytes(packet.Data);
             _client.Send(packet.DataBuffer);
 
             IPEndPoint clientIP = _client.RemoteEndPoint as IPEndPoint;
