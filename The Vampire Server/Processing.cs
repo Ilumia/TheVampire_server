@@ -131,11 +131,11 @@ namespace The_Vampire_Server
                 _data += "t ";
             else
                 _data += "f ";
-            foreach (string _userId in roomInfo.users.Values)
+            foreach (Player _player in roomInfo.users.Values)
             {
-                if (_userId != null)
+                if (_player.id != null)
                 {
-                    _data += _userId + " ";
+                    _data += _player.id + " ";
                 }
             }
             Console.WriteLine(_data);
@@ -165,14 +165,21 @@ namespace The_Vampire_Server
         private void RoomExitProc(byte[] data, Socket client) {
             int _roomNumber = Int32.Parse(Encoding.Unicode.GetString(data));
             RoomInfo roomInfo = roomSet.Find(x => x.roomNumber == _roomNumber);
-
+            bool state = roomInfo.ExitRoom(client);
+            foreach (Player _pl in roomInfo.users.Values)
+            {
+                Console.WriteLine(_pl.id);
+            }
             if (roomInfo.owner.Equals(client))
             {
                 foreach (Socket _client in roomInfo.users.Keys)
+                {
                     SendDataToClient((byte)101, Encoding.Unicode.GetBytes("f"), _client);
+                    clientSet[_client] = new User(clientSet[_client].id, ClientState.ONLOBBY);
+                }
+                return;
             }
 
-            bool state = roomInfo.ExitRoom(client);
             if (state)
             {
                 clientSet[client] = new User(clientSet[client].id, ClientState.ONLOBBY);

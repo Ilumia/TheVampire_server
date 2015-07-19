@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace The_Vampire_Server
 {
-    public struct Packet
+    public struct Message
     {
         private byte[] data;
         private int length;
@@ -54,6 +54,43 @@ namespace The_Vampire_Server
             state = _state;
         }
     }
+    public enum PlayerState { UNSET, TURN_ON, TURN_OFF, DROPPED };
+    public enum PlayerJob { UNSET, VAMPIRE };
+    public struct Player
+    {
+        public string id;
+        public PlayerJob job;
+        public PlayerState state;
+        public int item1;
+        public int item2;
+        public int item3;
+        public bool isAI;
+        public Player(string id)
+        {
+            this.id = id;
+            job = PlayerJob.UNSET;
+            state = PlayerState.UNSET;
+            item1 = 0;
+            item2 = 0;
+            item3 = 0;
+            isAI = false;
+        }
+        public void InitPlayer(PlayerJob job, bool isAI) {
+            this.job = job;
+            this.isAI = isAI;
+            /*  초기아이템 및 상태정의
+            switch (job)
+            {
+                case PlayerJob.:
+                    break;
+                case PlayerJob.:
+                    break;
+                case PlayerJob.:
+                    break;
+            }
+            */
+        }
+    }
 
     public struct RoomInfo
     {
@@ -62,21 +99,21 @@ namespace The_Vampire_Server
         public int totalNumber;
         public int maximumNumber;
         public bool isPublic;
-        public Dictionary<Socket, string> users;
+        public Dictionary<Socket, Player> users;
         public Socket owner;
-        //public string[] users;
-        //public Socket[] clients;
+        public int roomState;   // -1: 시작 전, 0: 게임종료, 1이상의 양수: 진행회차
 
         public RoomInfo(Socket _owner, string _ownerId, int _maximumNumber, bool _isPublic)
         {
             roomNumber = nextRoomNumber;
             nextRoomNumber++;
-            users = new Dictionary<Socket, string>();
-            users.Add(_owner, _ownerId);
+            users = new Dictionary<Socket, Player>();
+            users.Add(_owner, new Player(_ownerId));
             owner = _owner;
             totalNumber = 1;
             maximumNumber = _maximumNumber;
             isPublic = _isPublic;
+            roomState = -1;
         }
 
         public bool ConfigRoom(int _maximumNumber, bool _isPublic)
@@ -94,7 +131,7 @@ namespace The_Vampire_Server
         {
             if (totalNumber < maximumNumber)
             {
-                users.Add(client, clientid);
+                users.Add(client, new Player(clientid));
                 totalNumber++;
             }
             return true;

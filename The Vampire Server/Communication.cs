@@ -9,6 +9,15 @@ namespace The_Vampire_Server
     partial class Server {
         public Server()
         {
+            string tt = "!@(&#(#^&$@";
+            byte[] ttt = CompressToBytes(tt);
+            Console.WriteLine(System.Text.ASCIIEncoding.Unicode.GetByteCount(tt));
+            Console.WriteLine(ttt.Length);
+            foreach (byte t in ttt)
+            {
+                Console.WriteLine((char)t);
+            }
+
             Socket _server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IPEndPoint _ipep = new IPEndPoint(IPAddress.Any, 8000);
             _server.Bind(_ipep);
@@ -24,7 +33,6 @@ namespace The_Vampire_Server
         }
         public void DataInput() {
             String _data;
-            Packet packet = new Packet();
             Console.WriteLine("Start up server");
             while (true) {
                 _data = Console.ReadLine();
@@ -38,7 +46,7 @@ namespace The_Vampire_Server
         }
         private void SendDataToClient(byte type, byte[] data, Socket client)
         {
-            Packet packet = new Packet();
+            Message packet = new Message();
             if (!client.Connected)
             {
                 DisconnectProc(client);
@@ -77,24 +85,22 @@ namespace The_Vampire_Server
             byte[] _data = Encoding.Unicode.GetBytes(__data);
             return _data;
         }
+        
         private void DisconnectProc(Socket client)
         {
             if (clientSet[client].state == ClientState.ONROOM || clientSet[client].state == ClientState.ONGAME)
             {
                 RoomInfo roomInfo = roomSet.Find(x => x.users.ContainsKey(client));
                 RoomExitProc(Encoding.Unicode.GetBytes(roomInfo.roomNumber.ToString()), client);
-                foreach (Socket _user in roomInfo.users.Keys)
-                {
-                    clientSet[_user] = new User(clientSet[_user].id, ClientState.ONLOBBY);
-                }
+                clientSet[client] = new User(clientSet[client].id, ClientState.ONLOBBY);
             }
             clientSet.Remove(client);
-
+            
         }
         private void Accept_Completed(object sender, SocketAsyncEventArgs e) {
             Socket _client = e.AcceptSocket;
 
-            Packet packet = new Packet();
+            Message packet = new Message();
             SocketAsyncEventArgs _receiveArgs = new SocketAsyncEventArgs();
             _receiveArgs.UserToken = packet;
             _receiveArgs.SetBuffer(packet.GetBuffer(), 0, 4);
@@ -111,7 +117,7 @@ namespace The_Vampire_Server
         }
         private void Recieve_Completed(object sender, SocketAsyncEventArgs e) {
             Socket _client = (Socket)sender;
-            Packet packet = (Packet)e.UserToken;
+            Message packet = (Message)e.UserToken;
             packet.InitRecvPacket(e.Buffer);
             IPEndPoint clientIP = _client.RemoteEndPoint as IPEndPoint;
             if (_client.Connected) {
@@ -201,7 +207,7 @@ namespace The_Vampire_Server
         private void Send_Completed(object sender, SocketAsyncEventArgs e)
         {
             Socket _client = (Socket)sender;
-            Packet packet = (Packet)e.UserToken;
+            Message packet = (Message)e.UserToken;
             //packet.Data = CompressToBytes(packet.Data);
             _client.Send(packet.DataBuffer);
 
