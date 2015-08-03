@@ -34,6 +34,7 @@ namespace The_Vampire_Server
         public void DataInput() {
             String _data;
             Console.WriteLine("Start up server");
+
             while (true) {
                 _data = Console.ReadLine();
                 if (_data.CompareTo("exit") == 0) { break; }
@@ -49,6 +50,7 @@ namespace The_Vampire_Server
             Message packet = new Message();
             if (!client.Connected)
             {
+                Console.WriteLine(client.Handle + " is disconnected");
                 DisconnectProc(client);
             }
             else
@@ -170,7 +172,6 @@ namespace The_Vampire_Server
                         case 'L':
                             DeleteFriendProc(data, _client);
                             break;
-
 
                         case 'Y':
                             MonitorProc(data, _client);

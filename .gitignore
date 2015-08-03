@@ -32,7 +32,7 @@ build/
 *.scc
 
 # Temporary file
-*~$
+*~$*
 
 #Solution User Option
 *.suo

@@ -16,6 +16,8 @@ namespace The_Vampire_Server
         static void Main(string[] args)
         {
             new Server();
+
+            
         }
     }
 }
