@@ -34,24 +34,22 @@ namespace The_Vampire_Server
                 SendDataToClient((byte)97, Encoding.Unicode.GetBytes("f"), client);
             }
         }
-        /* LobbyInfoProc: 보류 
         private void LobbyInfoProc(Socket client)
         {
             string data = "";
-            for(int i=0; i<lobbySet.Count; i++) {
-                if (lobbySet[i].isPublic)
+            for(int i=0; i<roomSet.Count; i++) {
+                if (roomSet[i].isPublic)
                 {
-                    if (lobbySet[i].totalNumber < lobbySet[i].maximumNumber)
+                    if (roomSet[i].totalNumber < roomSet[i].maximumNumber)
                     {
-                        data += lobbySet[i].lobbyNumber.ToString() + " ";
-                        data += lobbySet[i].totalNumber.ToString() + " ";
-                        data += lobbySet[i].maximumNumber.ToString() + " ";
+                        data += roomSet[i].roomNumber.ToString() + " ";
+                        data += roomSet[i].totalNumber.ToString() + " ";
+                        data += roomSet[i].maximumNumber.ToString() + " ";
                     }
                 }
             }
             SendDataToClient((byte)98, Encoding.Unicode.GetBytes(data), client);
         }
-        */
         private void RoomCreateProc(byte[] data, Socket client)
         {
             string _tempString = Encoding.Unicode.GetString(data);
@@ -73,7 +71,7 @@ namespace The_Vampire_Server
                 _data += "t";
             else
                 _data += "f";
-            SendDataToClient((byte)99, Encoding.Unicode.GetBytes(_data), client);
+            SendDataToClient((byte)99, Encoding.Unicode.GetBytes("s"), client);
             clientSet[client] = new User(clientSet[client].id, ClientState.ONROOM);
         }
         private void RoomConfigProc(byte[] data, Socket client)

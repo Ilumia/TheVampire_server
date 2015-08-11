@@ -140,7 +140,7 @@ namespace The_Vampire_Server
                             LoginProc(data, _client);
                             break;
                         case 'B':
-                            //LobbyInfoProc();
+                            LobbyInfoProc(_client);
                             break;
                         case 'C':
                             RoomCreateProc(data, _client);
