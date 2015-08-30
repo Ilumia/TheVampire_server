@@ -54,43 +54,6 @@ namespace The_Vampire_Server
             state = _state;
         }
     }
-    public enum PlayerState { UNSET, TURN_ON, TURN_OFF, DROPPED };
-    public enum PlayerJob { UNSET, VAMPIRE };
-    public struct Player
-    {
-        public string id;
-        public PlayerJob job;
-        public PlayerState state;
-        public int item1;
-        public int item2;
-        public int item3;
-        public bool isAI;
-        public Player(string id)
-        {
-            this.id = id;
-            job = PlayerJob.UNSET;
-            state = PlayerState.UNSET;
-            item1 = 0;
-            item2 = 0;
-            item3 = 0;
-            isAI = false;
-        }
-        public void InitPlayer(PlayerJob job, bool isAI) {
-            this.job = job;
-            this.isAI = isAI;
-            /*  초기아이템 및 상태정의
-            switch (job)
-            {
-                case PlayerJob.:
-                    break;
-                case PlayerJob.:
-                    break;
-                case PlayerJob.:
-                    break;
-            }
-            */
-        }
-    }
 
     public struct RoomInfo
     {
@@ -142,5 +105,93 @@ namespace The_Vampire_Server
             totalNumber--;
             return true;
         }
+    }
+
+    public enum PlayerState { UNSET, TURN_ON, TURN_OFF, DROPPED };
+    public enum PlayerJob { UNSET, VAMPIRE, HUNTER };
+    public struct Player
+    {
+        public string id;
+        public PlayerJob job;
+        public PlayerState state;
+        public bool isAI;
+        public Player(string id)
+        {
+            this.id = id;
+            job = PlayerJob.UNSET;
+            state = PlayerState.UNSET;
+            isAI = false;
+        }
+        public void InitPlayer(PlayerJob job, bool isAI)
+        {
+            this.job = job;
+            this.isAI = isAI;
+            /*  초기아이템 및 상태정의
+                switch (job)
+                {
+                    case PlayerJob.:
+                        break;
+                    case PlayerJob.:
+                        break;
+                    case PlayerJob.:
+                        break;
+                }
+            */
+        }
+    }
+
+    public struct UserInfo
+    {
+        public string id;
+        public Item item;
+        public UserInfo(string _id)
+        {
+            id = _id;
+            item = new Item();
+        }
+    }
+    public struct Item
+    {
+        public Dictionary<int, Ability> abilitySet;
+        public Dictionary<int, InfoCard> infoCardSet;
+        public Dictionary<int, BattleCard> battleCardSet;
+        public int itemVersion;
+        public void SetItem(Dictionary<int, Ability> _abilitySet)
+        {
+            abilitySet = _abilitySet;
+        }
+        public void SetItem(Dictionary<int, InfoCard> _infoCardSet)
+        {
+            infoCardSet = _infoCardSet;
+        }
+        public void SetItem(Dictionary<int, BattleCard> _battleCardSet)
+        {
+            battleCardSet = _battleCardSet;
+        }
+        public void SetItem(Dictionary<int, Ability> _abilitySet, Dictionary<int, InfoCard> _infoCardSet, Dictionary<int, BattleCard> _battleCardSet)
+        {
+            this.abilitySet = _abilitySet;
+            this.infoCardSet = _infoCardSet;
+            this.battleCardSet = _battleCardSet;
+        }
+    }
+    public struct Ability
+    {
+        public float effect;
+        public float effectFactor;
+    }
+    public struct InfoCard
+    {
+        public float pickRate;
+        public float cuccessRate;
+        public float upgrade;
+    }
+    public struct BattleCard
+    {
+        public float effect;
+        public float effectFactor;
+        public float pickRate;
+        public float cuccessRate;
+        public float upgrade;
     }
 }

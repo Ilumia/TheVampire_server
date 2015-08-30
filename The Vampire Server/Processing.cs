@@ -26,7 +26,7 @@ namespace The_Vampire_Server
             {
                 // 로그인 성공
                 clientSet[client] = new User(userid, ClientState.ONLOGIN);
-                SendDataToClient((byte)97, Encoding.Unicode.GetBytes("s"), client);
+                SendDataToClient((byte)97, Encoding.Unicode.GetBytes("s " + item.itemVersion), client);
             }
             else
             {
@@ -73,6 +73,7 @@ namespace The_Vampire_Server
                 _data += "f";
             SendDataToClient((byte)99, Encoding.Unicode.GetBytes("s"), client);
             clientSet[client] = new User(clientSet[client].id, ClientState.ONROOM);
+            RoomUpdateProc(roomInfo);
         }
         private void RoomConfigProc(byte[] data, Socket client)
         {
@@ -96,8 +97,7 @@ namespace The_Vampire_Server
             RoomInfo roomInfo = roomSet.Find(x => x.roomNumber == _roomNumber);
 
             bool state = roomInfo.JoinRoom(client, clientSet[client].id);
-
-            string _data = "";
+            
             if (state)
             {
                 clientSet[client] = new User(clientSet[client].id, ClientState.ONROOM);
@@ -105,8 +105,7 @@ namespace The_Vampire_Server
             }
             else
             {
-                _data += "f";
-                SendDataToClient((byte)100, Encoding.Unicode.GetBytes(_data), client);
+                SendDataToClient((byte)100, new byte[0], client);
             }
         }
         private void RoomEnterProc(Socket client)
@@ -116,12 +115,14 @@ namespace The_Vampire_Server
                 if (roomInfo.isPublic && roomInfo.totalNumber < roomInfo.maximumNumber)
                 {
                     SpecificRoomEnterProc(Encoding.Unicode.GetBytes(roomInfo.roomNumber.ToString()), client);
+                    return;
                 }
             }
+            SendDataToClient((byte)100, new byte[0], client);
         }
         private void RoomUpdateProc(RoomInfo roomInfo)
         {
-            string _data = "s ";
+            string _data = "";
             _data += roomInfo.roomNumber.ToString() + " ";
             _data += roomInfo.totalNumber.ToString() + " ";
             _data += roomInfo.maximumNumber.ToString() + " ";
@@ -131,7 +132,7 @@ namespace The_Vampire_Server
                 _data += "f ";
             foreach (Player _player in roomInfo.users.Values)
             {
-                if (_player.id != null)
+                if (true /*_player.id != null*/)
                 {
                     _data += _player.id + " ";
                 }

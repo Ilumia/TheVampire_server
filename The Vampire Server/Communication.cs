@@ -9,15 +9,7 @@ namespace The_Vampire_Server
     partial class Server {
         public Server()
         {
-            string tt = "!@(&#(#^&$@";
-            byte[] ttt = CompressToBytes(tt);
-            Console.WriteLine(System.Text.ASCIIEncoding.Unicode.GetByteCount(tt));
-            Console.WriteLine(ttt.Length);
-            foreach (byte t in ttt)
-            {
-                Console.WriteLine((char)t);
-            }
-
+            ReadItemSet(item);
             Socket _server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IPEndPoint _ipep = new IPEndPoint(IPAddress.Any, 8000);
             _server.Bind(_ipep);

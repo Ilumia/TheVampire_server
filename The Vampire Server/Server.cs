@@ -11,13 +11,13 @@ namespace The_Vampire_Server
     {
         Dictionary<Socket, User> clientSet = new Dictionary<Socket, User>();
         List<RoomInfo> roomSet = new List<RoomInfo>();
+        Item item = new Item();
         string errors = "";
 
         static void Main(string[] args)
         {
-            new Server();
+            Server server = new Server();
 
-            
         }
     }
 }
