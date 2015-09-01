@@ -9,7 +9,7 @@ namespace The_Vampire_Server
     partial class Server {
         public Server()
         {
-            ReadItemSet(item);
+            ReadItemSet();
             Socket _server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IPEndPoint _ipep = new IPEndPoint(IPAddress.Any, 8000);
             _server.Bind(_ipep);

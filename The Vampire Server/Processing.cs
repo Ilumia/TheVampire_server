@@ -26,7 +26,7 @@ namespace The_Vampire_Server
             {
                 // 로그인 성공
                 clientSet[client] = new User(userid, ClientState.ONLOGIN);
-                SendDataToClient((byte)97, Encoding.Unicode.GetBytes("s " + item.itemVersion), client);
+                SendDataToClient((byte)97, Encoding.Unicode.GetBytes(item.itemVersion.ToString()), client);
             }
             else
             {

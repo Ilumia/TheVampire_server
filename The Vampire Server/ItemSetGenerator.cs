@@ -11,7 +11,7 @@ namespace The_Vampire_Server
     partial class Server
     {
         string path = System.IO.Directory.GetCurrentDirectory() + "/itemset";
-        void ReadItemSet(Item item)
+        void ReadItemSet()
         {
             if (!File.Exists(path))
             {
