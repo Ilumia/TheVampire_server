@@ -4,6 +4,7 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Data;
+using System.IO;
 
 namespace The_Vampire_Server
 {
@@ -250,6 +251,12 @@ namespace The_Vampire_Server
 
         //Disconnect 시 종료처리
 
+        private void ItemListProc(Socket client)
+        {
+            string path = System.IO.Directory.GetCurrentDirectory() + "/itemset";
+            string data = File.ReadAllText(path, Encoding.Default);
+            SendDataToClient((byte)119, data, client);
+        }
         private void MonitorProc(byte[] data, Socket client)
         {
             char request = (char)data[0];

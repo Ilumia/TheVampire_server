@@ -20,7 +20,7 @@ namespace The_Vampire_Server
             }
             try
             {
-                string _cardSet = File.ReadAllText(path);
+                string _cardSet = File.ReadAllText(path, Encoding.Default);
                 string[] cardSet = _cardSet.Split('\n');
                 Dictionary<int, Ability> abilitySet = new Dictionary<int, Ability>();
                 Dictionary<int, InfoCard> infoCardSet = new Dictionary<int, InfoCard>();

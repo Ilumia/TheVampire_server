@@ -165,6 +165,9 @@ namespace The_Vampire_Server
                             DeleteFriendProc(data, _client);
                             break;
 
+                        case 'V':
+                            ItemListProc(_client);
+                            break;
                         case 'Y':
                             MonitorProc(data, _client);
                             break;
