@@ -10,7 +10,7 @@ namespace The_Vampire_Server
 {
     partial class Server
     {
-        string path = System.IO.Directory.GetCurrentDirectory() + "/itemset";
+        string path = System.IO.Directory.GetCurrentDirectory() + "/.itemset";
         void ReadItemSet()
         {
             if (!File.Exists(path))
@@ -26,9 +26,14 @@ namespace The_Vampire_Server
                 Dictionary<int, InfoCard> infoCardSet = new Dictionary<int, InfoCard>();
                 Dictionary<int, BattleCard> battleCardSet = new Dictionary<int, BattleCard>();
 
-                Int32.TryParse(cardSet[0], out item.itemVersion);
+                string[] tmpNum = cardSet[0].Split(' ');
+                Int32.TryParse(tmpNum[0], out item.itemVersion);
+                int abilityNum; int informationNum; int battleNum;
+                Int32.TryParse(tmpNum[1], out abilityNum);
+                Int32.TryParse(tmpNum[2], out informationNum);
+                Int32.TryParse(tmpNum[3], out battleNum);
                 int i = 2;
-                for (; i < cardSet.Length; i++)
+                for (; i < abilityNum + 2; i++)
                 {
                     string[] tmp = cardSet[i].Split('\t');
                     Ability _ability = new Ability();
@@ -43,28 +48,20 @@ namespace The_Vampire_Server
                     float.TryParse(tmp[4], out _ability.effectFactor);
                     abilitySet.Add(number, _ability);
                 }
-                for (; i < cardSet.Length; i++)
+                for (; i < informationNum + abilityNum + 2; i++)
                 {
-                    if (!cardSet[i].Equals("$battle"))
-                    {
-                        string[] tmp = cardSet[i].Split('\t');
-                        InfoCard _info = new InfoCard();
-                        int number;
-                        bool check = Int32.TryParse(tmp[0], out number);
-                        if (!check)
-                        {
-                            i++;
-                            break;
-                        }
-                        float.TryParse(tmp[3], out _info.pickRate);
-                        float.TryParse(tmp[4], out _info.cuccessRate);
-                        infoCardSet.Add(number, _info);
-                    }
-                    else
+                    string[] tmp = cardSet[i].Split('\t');
+                    InfoCard _info = new InfoCard();
+                    int number;
+                    bool check = Int32.TryParse(tmp[0], out number);
+                    if (!check)
                     {
                         i++;
                         break;
                     }
+                    float.TryParse(tmp[3], out _info.pickRate);
+                    float.TryParse(tmp[4], out _info.cuccessRate);
+                    infoCardSet.Add(number, _info);
                 }
                 for (; i < cardSet.Length; i++)
                 {
