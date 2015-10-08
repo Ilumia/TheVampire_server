@@ -54,10 +54,9 @@ namespace The_Vampire_Server
         private void RoomCreateProc(byte[] data, Socket client)
         {
             string _tempString = Encoding.Unicode.GetString(data);
-            string[] _tempStringArray = _tempString.Split(' ');
-            int maximumNumber = Int32.Parse(_tempStringArray[0]);
+            int maximumNumber = 4;
             bool isPublic;
-            if(_tempStringArray[1].Equals("t"))
+            if (_tempString.Equals("t"))
                 isPublic = true;
             else
                 isPublic = false;
@@ -65,14 +64,12 @@ namespace The_Vampire_Server
             RoomInfo roomInfo = new RoomInfo(client, clientSet[client].id, maximumNumber, isPublic);
             roomSet.Add(roomInfo);
 
-            string _data = "";
-            _data += roomInfo.roomNumber.ToString() + " ";
-            _data += roomInfo.maximumNumber.ToString() + " ";
+            string _data = "s ";
             if (roomInfo.isPublic)
                 _data += "t";
             else
                 _data += "f";
-            SendDataToClient((byte)99, Encoding.Unicode.GetBytes("s"), client);
+            SendDataToClient((byte)99, Encoding.Unicode.GetBytes(_data), client);
             clientSet[client] = new User(clientSet[client].id, ClientState.ONROOM);
             RoomUpdateProc(roomInfo);
         }

@@ -14,6 +14,23 @@ namespace The_Vampire_Server
         static Item item = new Item();
         string errors = "";
 
+        public Server()
+        {
+            ReadItemSet();
+            Socket _server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            IPEndPoint _ipep = new IPEndPoint(IPAddress.Any, 8000);
+            _server.Bind(_ipep);
+            _server.Listen(20);
+            Console.WriteLine("Handle of server process: " + _server.Handle.ToInt32());
+
+            SocketAsyncEventArgs _args = new SocketAsyncEventArgs();
+            _args.Completed += new EventHandler<SocketAsyncEventArgs>(Accept_Completed);
+
+            _server.AcceptAsync(_args);
+
+            DataInput();
+        }
+
         static void Main(string[] args)
         {
             Server server = new Server();
