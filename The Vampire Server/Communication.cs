@@ -72,7 +72,9 @@ namespace The_Vampire_Server
                 RoomInfo roomInfo = roomSet.Find(x => x.users.ContainsKey(client));
                 RoomExitProc(Encoding.Unicode.GetBytes(roomInfo.roomNumber.ToString()), client);
                 clientSet[client] = new User(clientSet[client].id, ClientState.ONLOBBY);
+                Console.WriteLine(clientSet[client].id + " is out of room!!!");
             }
+            Console.WriteLine(clientSet[client].id + " is disconnected!!!");
             clientSet.Remove(client);
             
         }
@@ -105,6 +107,10 @@ namespace The_Vampire_Server
                 byte[] data = null;
                 if (packet.Length > 0)
                 {
+                    if(packet.Data == null)
+                    {
+                        return;
+                    }
                     data = DecompressToBytes(packet.Data);
                 }
 
@@ -158,6 +164,9 @@ namespace The_Vampire_Server
                             break;
                         case 'Z':
                             NoticeProc(data, _client);
+                            break;
+                        default:
+                            return;
                             break;
                     }
                 }

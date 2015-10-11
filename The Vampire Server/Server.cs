@@ -18,7 +18,7 @@ namespace The_Vampire_Server
         {
             ReadItemSet();
             Socket _server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            IPEndPoint _ipep = new IPEndPoint(IPAddress.Any, 8000);
+            IPEndPoint _ipep = new IPEndPoint(IPAddress.Any, 50005);
             _server.Bind(_ipep);
             _server.Listen(20);
             Console.WriteLine("Handle of server process: " + _server.Handle.ToInt32());
