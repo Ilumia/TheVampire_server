@@ -66,6 +66,8 @@ namespace The_Vampire_Server
         public Dictionary<Socket, Player> users;
         public Socket owner;
         public int roomState;   // -1: 시작 전, 0: 게임종료, 1이상의 양수: 진행회차
+        public float timer;
+        public bool isReadyToStart;
 
         public RoomInfo(Socket _owner, string _ownerId, int _maximumNumber, bool _isPublic)
         {
@@ -78,8 +80,39 @@ namespace The_Vampire_Server
             maximumNumber = _maximumNumber;
             isPublic = _isPublic;
             roomState = -1;
+            timer = 0.0f;
+            isReadyToStart = false;
         }
 
+        public void TimerUpdate()
+        {
+            if (timer < 0.0f)
+            {
+                timer -= 0.1f;
+            }
+            else
+            {
+                if(roomState == -1)
+                {
+                    if(isReadyToStart)
+                    {
+                        // Send gameStart message
+                        foreach(Socket client in users.Keys)
+                        {
+                            Server.GetInstance().SendDataToClient((byte)106, "", client);
+                        }
+                    }
+                } else if(roomState == 0)
+                {
+                    // Game is over
+                } else
+                {
+                    // Now playing
+                }
+            }
+        }
+
+        // No use
         public bool ConfigRoom(int _maximumNumber, bool _isPublic)
         {
             if (totalNumber > _maximumNumber)
@@ -97,6 +130,13 @@ namespace The_Vampire_Server
             {
                 users.Add(client, new Player(clientid));
                 totalNumber++;
+
+                // Countdown of Game start
+                if(totalNumber == 4)
+                {
+                    timer = 10.0f;
+                    isReadyToStart = true;
+                }
             }
             return true;
         }
@@ -104,6 +144,8 @@ namespace The_Vampire_Server
         {
             bool tt = users.Remove(client);
             totalNumber--;
+            timer = 0.0f;
+            isReadyToStart = false;
             return true;
         }
     }

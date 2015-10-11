@@ -3,16 +3,25 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using System.Timers;
 using System.Data;
 
 namespace The_Vampire_Server
 {
     partial class Server
     {
+        static Server server = null;
+        Timer timer = new System.Timers.Timer();
         Dictionary<Socket, User> clientSet = new Dictionary<Socket, User>();
         List<RoomInfo> roomSet = new List<RoomInfo>();
         static Item item = new Item();
         string errors = "";
+
+        static void Main(string[] args)
+        {
+            server = new Server();
+
+        }
 
         public Server()
         {
@@ -30,11 +39,25 @@ namespace The_Vampire_Server
 
             DataInput();
         }
-
-        static void Main(string[] args)
+        public static Server GetInstance()
         {
-            Server server = new Server();
-
+            return server;
         }
+
+        void SetTimer()
+        {
+            timer.Interval = 100;
+            timer.Elapsed += new ElapsedEventHandler(Timer);
+            timer.Start();
+        }
+
+        void Timer(object sender, EventArgs e)
+        {
+            foreach(RoomInfo roomInfo in roomSet)
+            {
+                roomInfo.TimerUpdate();
+            }
+        }
+
     }
 }
