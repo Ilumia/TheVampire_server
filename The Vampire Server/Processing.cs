@@ -95,7 +95,7 @@ namespace The_Vampire_Server
             RoomInfo roomInfo = roomSet.Find(x => x.roomNumber == _roomNumber);
 
             bool state = roomInfo.JoinRoom(client, clientSet[client].id);
-            
+
             if (state)
             {
                 clientSet[client] = new User(clientSet[client].id, ClientState.ONROOM);

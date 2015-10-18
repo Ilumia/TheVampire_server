@@ -4,7 +4,7 @@ CREATE DATABASE vampdb;
 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER
 	ON vampdb.* TO 'ilumia'@'localhost'
     IDENTIFIED BY 'vjpp56';
--- 인코딩 확인
+-- 인코딩 확인 (목표 인코딩: utf-8)
 SELECT schema_name, default_character_set_name 
 FROM information_schema.SCHEMATA;
 
@@ -12,14 +12,14 @@ FROM information_schema.SCHEMATA;
 CREATE TABLE users (
   userid      VARCHAR(30) PRIMARY KEY,
   userpassword    VARCHAR(60) not null,
-  socialid VARCHAR(30)
+  cardset VARCHAR(800)
 );
 CREATE TABLE friends (
 	userid VARCHAR(30),
 	friendid VARCHAR(30),
 	primary key (userid, friendid),
-	foreign key (userid) references users(userid),
-	foreign key (friendid) references users(userid)
+	foreign key (userid) references users(userid) ON DELETE CASCADE ON UPDATE CASCADE,
+	foreign key (friendid) references users(userid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 DROP TABLE users;
@@ -27,10 +27,8 @@ DROP TABLE friends;
 
 select * from users;
 select * from friends;
-
+-- cardset: cardno
 INSERT INTO users VALUES('InitID', 'InitPassword', NULL);
-INSERT INTO users VALUES('InitID2', 'InitPassword', NULL);
-DELETE FROM users;
 INSERT INTO friends VALUES('InitID', 'InitID');
-INSERT INTO friends VALUES('InitID', 'InitID2');
+DELETE FROM users;
 DELETE FROM friends;

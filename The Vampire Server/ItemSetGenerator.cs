@@ -32,18 +32,13 @@ namespace The_Vampire_Server
                 Int32.TryParse(tmpNum[1], out abilityNum);
                 Int32.TryParse(tmpNum[2], out informationNum);
                 Int32.TryParse(tmpNum[3], out battleNum);
-                int i = 2;
+                int i = 1;
                 for (; i < abilityNum + 2; i++)
                 {
                     string[] tmp = cardSet[i].Split('\t');
                     Ability _ability = new Ability();
                     int number;
-                    bool check = Int32.TryParse(tmp[0], out number);
-                    if(!check)
-                    {
-                        i++;
-                        break;
-                    }
+                    Int32.TryParse(tmp[0], out number);
                     float.TryParse(tmp[3], out _ability.effect);
                     float.TryParse(tmp[4], out _ability.effectFactor);
                     abilitySet.Add(number, _ability);
@@ -53,12 +48,7 @@ namespace The_Vampire_Server
                     string[] tmp = cardSet[i].Split('\t');
                     InfoCard _info = new InfoCard();
                     int number;
-                    bool check = Int32.TryParse(tmp[0], out number);
-                    if (!check)
-                    {
-                        i++;
-                        break;
-                    }
+                    Int32.TryParse(tmp[0], out number);
                     float.TryParse(tmp[3], out _info.pickRate);
                     float.TryParse(tmp[4], out _info.cuccessRate);
                     infoCardSet.Add(number, _info);
@@ -68,12 +58,7 @@ namespace The_Vampire_Server
                     string[] tmp = cardSet[i].Split('\t');
                     BattleCard _battle = new BattleCard();
                     int number;
-                    bool check = Int32.TryParse(tmp[0], out number);
-                    if (!check)
-                    {
-                        i++;
-                        break;
-                    }
+                    Int32.TryParse(tmp[0], out number);
                     float.TryParse(tmp[3], out _battle.effect);
                     float.TryParse(tmp[4], out _battle.effectFactor);
                     float.TryParse(tmp[5], out _battle.pickRate);

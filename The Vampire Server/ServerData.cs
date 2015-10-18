@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace The_Vampire_Server
 {
-    public struct Message
+    public class Message
     {
         private byte[] data;
         private int length;
@@ -44,19 +44,69 @@ namespace The_Vampire_Server
     }
 
     public enum ClientState { ONACCESS, ONLOGIN, ONLOBBY, ONROOM, ONGAME };
-    public struct User
+    public class User
     {
         public string id;
         public ClientState state;
+        public UserItem userItem;
 
         public User(string _id, ClientState _state)
         {
             id = _id;
             state = _state;
+            userItem = new UserItem(true);
+        }
+        public void SetAllItems()
+        {
+            UserAbility tmpAb = new UserAbility();
+            tmpAb.effectUpgrade = 0;
+            UserInfoCard tmpIn = new UserInfoCard();
+            tmpIn.pickRateUpgrade = 0;
+            UserBattleCard tmpBa = new UserBattleCard();
+            tmpBa.effectUpgrade = 0;
+            tmpBa.pickRateUpgrade = 0;
+            for (int i = 0; i < 7; i++)
+            {
+                userItem.abilities.Add(i, tmpAb);
+            }
+            for (int i = 30; i < 39; i++)
+            {
+                userItem.infoCards.Add(i, tmpIn);
+            }
+            for (int i = 60; i < 71; i++)
+            {
+                userItem.battleCards.Add(i, tmpBa);
+            }
         }
     }
 
-    public struct RoomInfo
+    public class UserItem
+    {
+        public Dictionary<int, UserAbility> abilities;
+        public Dictionary<int, UserInfoCard> infoCards;
+        public Dictionary<int, UserBattleCard> battleCards;
+        public UserItem(bool isInit)
+        {
+            abilities = new Dictionary<int, UserAbility>();
+            infoCards = new Dictionary<int, UserInfoCard>();
+            battleCards = new Dictionary<int, UserBattleCard>();
+        }
+    }
+    public class UserAbility
+    {
+        public int effectUpgrade;
+    }
+    public class UserInfoCard
+    {
+        public int pickRateUpgrade;
+    }
+    public class UserBattleCard
+    {
+        public int effectUpgrade;
+        public int pickRateUpgrade;
+    }
+
+    public class RoomInfo
     {
         public int roomNumber;
         private static int nextRoomNumber = 0;
@@ -86,21 +136,23 @@ namespace The_Vampire_Server
 
         public void TimerUpdate()
         {
-            if (timer < 0.0f)
+            if (timer > 0.0f)
             {
                 timer -= 0.1f;
             }
             else
             {
-                if(roomState == -1)
+                if (roomState == -1)
                 {
                     if(isReadyToStart)
                     {
                         // Send gameStart message
                         foreach(Socket client in users.Keys)
                         {
-                            Server.GetInstance().SendDataToClient((byte)106, "", client);
+                            Server.GetInstance().SendDataToClient((byte)106, new byte[0], client);
+                            Console.WriteLine("gameStart message!!");
                         }
+                        isReadyToStart = false;
                     }
                 } else if(roomState == 0)
                 {
@@ -126,16 +178,18 @@ namespace The_Vampire_Server
 
         public bool JoinRoom(Socket client, string clientid)
         {
+            Console.WriteLine(totalNumber);
             if (totalNumber < maximumNumber)
             {
                 users.Add(client, new Player(clientid));
-                totalNumber++;
+                this.totalNumber++;
 
                 // Countdown of Game start
-                if(totalNumber == 4)
+                if(this.totalNumber == 2)
                 {
                     timer = 10.0f;
                     isReadyToStart = true;
+                    Console.WriteLine("isReadyToStart: " + isReadyToStart);
                 }
             }
             return true;
@@ -152,7 +206,7 @@ namespace The_Vampire_Server
 
     public enum PlayerState { UNSET, TURN_ON, TURN_OFF, DROPPED };
     public enum PlayerJob { UNSET, VAMPIRE, HUNTER };
-    public struct Player
+    public class Player
     {
         public string id;
         public PlayerJob job;
@@ -183,17 +237,7 @@ namespace The_Vampire_Server
         }
     }
 
-    public struct UserInfo
-    {
-        public string id;
-        public Item item;
-        public UserInfo(string _id)
-        {
-            id = _id;
-            item = new Item();
-        }
-    }
-    public struct Item
+    public class Item
     {
         public Dictionary<int, Ability> abilitySet;
         public Dictionary<int, InfoCard> infoCardSet;
@@ -218,23 +262,21 @@ namespace The_Vampire_Server
             this.battleCardSet = _battleCardSet;
         }
     }
-    public struct Ability
+    public class Ability
     {
         public float effect;
         public float effectFactor;
     }
-    public struct InfoCard
+    public class InfoCard
     {
         public float pickRate;
         public float cuccessRate;
-        public float upgrade;
     }
-    public struct BattleCard
+    public class BattleCard
     {
         public float effect;
         public float effectFactor;
         public float pickRate;
         public float cuccessRate;
-        public float upgrade;
     }
 }

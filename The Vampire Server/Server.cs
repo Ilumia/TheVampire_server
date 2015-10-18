@@ -20,11 +20,11 @@ namespace The_Vampire_Server
         static void Main(string[] args)
         {
             server = new Server();
-
         }
 
         public Server()
         {
+            server = this;
             ReadItemSet();
             Socket _server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IPEndPoint _ipep = new IPEndPoint(IPAddress.Any, 50005);
@@ -36,7 +36,7 @@ namespace The_Vampire_Server
             _args.Completed += new EventHandler<SocketAsyncEventArgs>(Accept_Completed);
 
             _server.AcceptAsync(_args);
-
+            SetTimer();
             DataInput();
         }
         public static Server GetInstance()

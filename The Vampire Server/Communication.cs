@@ -22,7 +22,7 @@ namespace The_Vampire_Server
         {
             SendDataToClient(type, Encoding.Unicode.GetBytes(data), client);
         }
-        private void SendDataToClient(byte type, byte[] data, Socket client)
+        public void SendDataToClient(byte type, byte[] data, Socket client)
         {
             Message packet = new Message();
             if (!client.Connected)
