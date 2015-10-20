@@ -43,7 +43,6 @@ namespace The_Vampire_Server
         }
     }
 
-    public enum ClientState { ONACCESS, ONLOGIN, ONLOBBY, ONROOM, ONGAME };
     public class User
     {
         public string id;
@@ -54,7 +53,7 @@ namespace The_Vampire_Server
         {
             id = _id;
             state = _state;
-            userItem = new UserItem(true);
+            userItem = new UserItem();
         }
         public void SetAllItems()
         {
@@ -85,7 +84,7 @@ namespace The_Vampire_Server
         public Dictionary<int, UserAbility> abilities;
         public Dictionary<int, UserInfoCard> infoCards;
         public Dictionary<int, UserBattleCard> battleCards;
-        public UserItem(bool isInit)
+        public UserItem()
         {
             abilities = new Dictionary<int, UserAbility>();
             infoCards = new Dictionary<int, UserInfoCard>();
@@ -146,10 +145,19 @@ namespace The_Vampire_Server
                 {
                     if(isReadyToStart)
                     {
+                        Server.ClassSetting(users);
                         // Send gameStart message
-                        foreach(Socket client in users.Keys)
+                        foreach (KeyValuePair<Socket, Player> pair in users)
                         {
-                            Server.GetInstance().SendDataToClient((byte)106, new byte[0], client);
+                            String _t = "";
+                            if (pair.Value.job == PlayerJob.HUNTER)
+                            {
+                                _t = "h";
+                            } else
+                            {
+                                _t = "v";
+                            }
+                            Server.GetInstance().SendDataToClient((byte)106, _t, pair.Key);
                             Console.WriteLine("gameStart message!!");
                         }
                         isReadyToStart = false;
@@ -204,36 +212,56 @@ namespace The_Vampire_Server
         }
     }
 
-    public enum PlayerState { UNSET, TURN_ON, TURN_OFF, DROPPED };
-    public enum PlayerJob { UNSET, VAMPIRE, HUNTER };
+    public enum ClientState { ONACCESS, ONLOGIN, ONLOBBY, ONROOM, ONGAME };
+    public enum PlayerJob { VAMPIRE, HUNTER };
     public class Player
     {
         public string id;
-        public PlayerJob job;
-        public PlayerState state;
+        public ClientState state;
+        public UserItem item;
         public bool isAI;
+        public PlayerJob job;
+        public int hp;
         public Player(string id)
         {
             this.id = id;
-            job = PlayerJob.UNSET;
-            state = PlayerState.UNSET;
-            isAI = false;
+            this.state = ClientState.ONACCESS;
+            item = new UserItem();
+            SetAllItems();
+            hp = 100;
         }
-        public void InitPlayer(PlayerJob job, bool isAI)
+        public Player(string id, ClientState state)
         {
-            this.job = job;
-            this.isAI = isAI;
-            /*  초기아이템 및 상태정의
-                switch (job)
-                {
-                    case PlayerJob.:
-                        break;
-                    case PlayerJob.:
-                        break;
-                    case PlayerJob.:
-                        break;
-                }
-            */
+            this.id = id;
+            this.state = state;
+            item = new UserItem();
+            SetAllItems();
+            hp = 100;
+        }
+        public void SetState(ClientState state) { this.state = state; }
+        public void SetJob(PlayerJob job) { this.job = job; }
+
+        public void SetAllItems()
+        {
+            UserAbility tmpAb = new UserAbility();
+            tmpAb.effectUpgrade = 0;
+            UserInfoCard tmpIn = new UserInfoCard();
+            tmpIn.pickRateUpgrade = 0;
+            UserBattleCard tmpBa = new UserBattleCard();
+            tmpBa.effectUpgrade = 0;
+            tmpBa.pickRateUpgrade = 0;
+            for (int i = 0; i < 7; i++)
+            {
+                item.abilities.Add(i, tmpAb);
+            }
+            for (int i = 30; i < 39; i++)
+            {
+                item.infoCards.Add(i, tmpIn);
+            }
+            for (int i = 60; i < 71; i++)
+            {
+                item.battleCards.Add(i, tmpBa);
+            }
         }
     }
 

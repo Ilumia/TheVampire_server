@@ -17,6 +17,7 @@ namespace The_Vampire_Server
         static Item item = new Item();
         string errors = "";
 
+
         static void Main(string[] args)
         {
             server = new Server();
