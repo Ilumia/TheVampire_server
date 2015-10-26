@@ -64,7 +64,10 @@ namespace The_Vampire_Server
             byte[] _data = Encoding.Unicode.GetBytes(__data);
             return _data;
         }
-        
+        private RoomInfo FindRoomFromSocket(Socket client)
+        {
+            return roomSet.Find(x => x.users.ContainsKey(client));
+        }
         private void DisconnectProc(Socket client)
         {
             if (clientSet[client].state == ClientState.ONROOM || clientSet[client].state == ClientState.ONGAME)

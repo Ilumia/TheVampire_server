@@ -162,9 +162,9 @@ namespace The_Vampire_Server
         private void RoomExitProc(byte[] data, Socket client)
         {
             Console.WriteLine(clientSet[client].id + " is exit");
-            int _roomNumber = Int32.Parse(Encoding.Unicode.GetString(data));
-            RoomInfo roomInfo = roomSet.Find(x => x.roomNumber == _roomNumber);
-            roomInfo = roomSet.Find(x => x.users.ContainsKey(client));
+            //int _roomNumber = Int32.Parse(Encoding.Unicode.GetString(data));
+            //RoomInfo roomInfo = roomSet.Find(x => x.roomNumber == _roomNumber);
+            RoomInfo roomInfo = roomSet.Find(x => x.users.ContainsKey(client));
             bool state = roomInfo.ExitRoom(client);
             if (roomInfo.owner == client)
             {
@@ -249,6 +249,22 @@ namespace The_Vampire_Server
             string _sql = "DELETE FROM friends WHERE userid = '" + clientSet[client].id + "' and friendid = '" + friendid + "'";
 
             int result = dataManager.ExecuteUpdate(_sql);
+        }
+        private void RandomNumberProc(Socket client)
+        {
+            double _tmp = GetRandomDouble();
+            byte[] tmp = BitConverter.GetBytes(_tmp);
+            RoomInfo roomInfo = FindRoomFromSocket(client);
+            foreach (Socket _client in roomInfo.users.Keys)
+            {
+                SendDataToClient((byte)107, tmp, _client);
+            }
+        }
+        private void CardSubmitProc(byte[] data, Socket client)
+        {
+            string _data = Encoding.Unicode.GetString(data);
+            RoomInfo roomInfo = FindRoomFromSocket(client);
+            roomInfo.CardSubmitted(_data, client);
         }
 
         //Disconnect 시 종료처리

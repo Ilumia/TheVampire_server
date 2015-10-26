@@ -71,5 +71,9 @@ namespace The_Vampire_Server
         {
             return rand.Next(0, 100);
         }
+        private static double GetRandomDouble()
+        {
+            return (rand.NextDouble() * 999999999999999);
+        }
     }
 }

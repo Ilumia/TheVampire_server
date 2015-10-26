@@ -167,9 +167,18 @@ namespace The_Vampire_Server
                     // Game is over
                 } else
                 {
+                    Processing();
                     // Now playing
                 }
             }
+        }
+        public void CardSubmitted(string data, Socket client)
+        {
+
+        }
+        public void Processing()
+        {
+
         }
 
         // No use
@@ -222,6 +231,19 @@ namespace The_Vampire_Server
         public bool isAI;
         public PlayerJob job;
         public int hp;
+        public bool isHiding;           // 은폐
+        public bool isCamouflaging;     // 위장
+        public List<Player> isObserved; // 염탐(피)
+        public bool isRealizing;        // 파악
+        public bool isMuted;            // 입막음
+        public bool isConcealing;       // 엄폐
+        public bool isDefencing;        // 방어
+        public bool isConfusing;        // 교란
+        public bool isCounting;         // 반격
+        public bool isTrapping;         // 함정
+        public int isTrapped;           // 함정(피)
+        public bool isReattacking;      // 빠른 몸놀림
+        public bool isDisabled;          // 금제(피)
         public Player(string id)
         {
             this.id = id;
@@ -229,6 +251,19 @@ namespace The_Vampire_Server
             item = new UserItem();
             SetAllItems();
             hp = 100;
+            isHiding = false;
+            isCamouflaging = false;
+            isObserved = new List<Player>();
+            isRealizing = false;
+            isMuted = false;
+            isConcealing = false;
+            isDefencing = false;
+            isConfusing = false;
+            isCounting = false;
+            isTrapping = false;
+            isTrapped = 0;
+            isReattacking = false;
+            isDisabled = false;
         }
         public Player(string id, ClientState state)
         {
@@ -237,6 +272,19 @@ namespace The_Vampire_Server
             item = new UserItem();
             SetAllItems();
             hp = 100;
+            isHiding = false;
+            isCamouflaging = false;
+            isObserved = new List<Player>();
+            isRealizing = false;
+            isMuted = false;
+            isConcealing = false;
+            isDefencing = false;
+            isConfusing = false;
+            isCounting = false;
+            isTrapping = false;
+            isTrapped = 0;
+            isReattacking = false;
+            isDisabled = false;
         }
         public void SetState(ClientState state) { this.state = state; }
         public void SetJob(PlayerJob job) { this.job = job; }
