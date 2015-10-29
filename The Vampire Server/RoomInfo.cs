@@ -31,7 +31,7 @@ namespace The_Vampire_Server
             roomState = -1;
             timer = 0.0f;
             isReadyToStart = false;
-            postProcessQueue = new List<PostProcessQueue>();
+            processQueue = new Queue<ProcessQueue>();
         }
         public bool JoinRoom(Socket client, string clientid)
         {
@@ -114,7 +114,6 @@ namespace The_Vampire_Server
                 }
                 else
                 {
-                    Processing();
                     // Now playing
                 }
             }
@@ -162,7 +161,7 @@ namespace The_Vampire_Server
                     users[client].isHiding = true;
                     break;
                 case 32:    // 통신
-                    processQueue.Enqueue(new ProcessQueue(cardNo, player));
+
                     break;
                 case 33:    // 위장
                     users[client].isCamouflaging = true;
@@ -171,17 +170,20 @@ namespace The_Vampire_Server
                     target.isObserved.Add(player);
                     break;
 
-                //사용 안함
+                /* 사용 안함
                 case 35:    // 도청
                     break;
+                */
                 case 36:    // 파악
                     users[client].isRealizing = true;
                     break;
                 case 37:    // 입막음
                     processQueue.Enqueue(new ProcessQueue(cardNo, player, target));
                     break;
+                /* 클라이언트에서만 사용
                 case 38:    // 행동 재개
                     break;
+                */
                 case 60:    // 저격
                     processQueue.Enqueue(new ProcessQueue(cardNo, player, target));
                     break;
@@ -195,7 +197,7 @@ namespace The_Vampire_Server
                     users[client].isDefencing = true;
                     break;
                 case 64:    // 응급치료
-                    processQueue.Enqueue(new ProcessQueue(cardNo, player, target));
+                    
                     break;
                 case 65:    // 교란
                     users[client].isConfusing = true;
@@ -212,21 +214,55 @@ namespace The_Vampire_Server
                 case 69:    // 금제
                     target.isDisabled = true;
                     break;
+                /* 클라이언트에서만 사용
                 case 70:    // 행동 재개
                     break;
+                */
             }
         }
         public void PostProcessing()
         {
+            while(processQueue.Count > 0) {
+                ProcessQueue process = processQueue.Dequeue();
+                int randomNumber = Server.GetRandom();
+                switch (process.cardNo)
+                {
+                    case 30:    // 조사
+                        if (process.target.isHiding)
+                        {
+                            // 은폐상태
+                        }
+                        else if (process.target.isCamouflaging)
+                        {
+                            // 위장상태
+                        }
+                        else if (process.user.isObserved.Count > 0)
+                        {
+                            // 염탐상태
+                            process.user.isObserved.Clear();
+                        }
+                        else
+                        {
 
+                        }
+                        break;
+                    case 37:    // 입막음
+                        break;
+                    case 60:    // 저격
+                        break;
+                    case 61:    // 강타
+                        break;
+                }
+            }
+            // 일괄수행 (상태변화)
         }
 
 
     }
-    class ProcessQueue() {
-        int cardNo;
-        Player user;
-        Player target;
+    class ProcessQueue {
+        public int cardNo;
+        public Player user;
+        public Player target;
         public ProcessQueue(int _cardNo, Player _user, Player _target) {
             cardNo = _cardNo;
             user = _user;

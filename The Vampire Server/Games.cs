@@ -67,7 +67,7 @@ namespace The_Vampire_Server
                 }
             }
         }
-        private static int GetRandom()
+        public static int GetRandom()
         {
             return rand.Next(0, 100);
         }
