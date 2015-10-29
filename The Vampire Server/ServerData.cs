@@ -105,121 +105,7 @@ namespace The_Vampire_Server
         public int pickRateUpgrade;
     }
 
-    public class RoomInfo
-    {
-        public int roomNumber;
-        private static int nextRoomNumber = 0;
-        public int totalNumber;
-        public int maximumNumber;
-        public bool isPublic;
-        public Dictionary<Socket, Player> users;
-        public Socket owner;
-        public int roomState;   // -1: 시작 전, 0: 게임종료, 1이상의 양수: 진행회차
-        public float timer;
-        public bool isReadyToStart;
 
-        public RoomInfo(Socket _owner, string _ownerId, int _maximumNumber, bool _isPublic)
-        {
-            roomNumber = nextRoomNumber;
-            nextRoomNumber++;
-            users = new Dictionary<Socket, Player>();
-            users.Add(_owner, new Player(_ownerId));
-            owner = _owner;
-            totalNumber = 1;
-            maximumNumber = _maximumNumber;
-            isPublic = _isPublic;
-            roomState = -1;
-            timer = 0.0f;
-            isReadyToStart = false;
-        }
-
-        public void TimerUpdate()
-        {
-            if (timer > 0.0f)
-            {
-                timer -= 0.1f;
-            }
-            else
-            {
-                if (roomState == -1)
-                {
-                    if(isReadyToStart)
-                    {
-                        Server.ClassSetting(users);
-                        // Send gameStart message
-                        foreach (KeyValuePair<Socket, Player> pair in users)
-                        {
-                            String _t = "";
-                            if (pair.Value.job == PlayerJob.HUNTER)
-                            {
-                                _t = "h";
-                            } else
-                            {
-                                _t = "v";
-                            }
-                            Server.GetInstance().SendDataToClient((byte)106, _t, pair.Key);
-                            Console.WriteLine("gameStart message!!");
-                        }
-                        isReadyToStart = false;
-                    }
-                } else if(roomState == 0)
-                {
-                    // Game is over
-                } else
-                {
-                    Processing();
-                    // Now playing
-                }
-            }
-        }
-        public void CardSubmitted(string data, Socket client)
-        {
-
-        }
-        public void Processing()
-        {
-
-        }
-
-        // No use
-        public bool ConfigRoom(int _maximumNumber, bool _isPublic)
-        {
-            if (totalNumber > _maximumNumber)
-            {
-                return false;
-            }
-            maximumNumber = _maximumNumber;
-            isPublic = _isPublic;
-            return true;
-        }
-
-        public bool JoinRoom(Socket client, string clientid)
-        {
-            Console.WriteLine(totalNumber);
-            if (totalNumber < maximumNumber)
-            {
-                users.Add(client, new Player(clientid));
-                this.totalNumber++;
-
-                // Countdown of Game start
-                if(this.totalNumber == 2)
-                {
-                    timer = 10.0f;
-                    isReadyToStart = true;
-                    Console.WriteLine("isReadyToStart: " + isReadyToStart);
-                }
-            }
-            return true;
-        }
-        public bool ExitRoom(Socket client)
-        {
-            bool tt = users.Remove(client);
-            totalNumber--;
-            timer = 0.0f;
-            isReadyToStart = false;
-            return true;
-        }
-    }
 
     public enum ClientState { ONACCESS, ONLOGIN, ONLOBBY, ONROOM, ONGAME };
     public enum PlayerJob { VAMPIRE, HUNTER };
@@ -243,7 +129,7 @@ namespace The_Vampire_Server
         public bool isTrapping;         // 함정
         public int isTrapped;           // 함정(피)
         public bool isReattacking;      // 빠른 몸놀림
-        public bool isDisabled;          // 금제(피)
+        public bool isDisabled;         // 금제(피)
         public Player(string id)
         {
             this.id = id;

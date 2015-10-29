@@ -25,7 +25,6 @@ namespace The_Vampire_Server
 
         public Server()
         {
-            RandomNumberProc(null);
             server = this;
             ReadItemSet();
             Socket _server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

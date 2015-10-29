@@ -165,7 +165,7 @@ namespace The_Vampire_Server
             //int _roomNumber = Int32.Parse(Encoding.Unicode.GetString(data));
             //RoomInfo roomInfo = roomSet.Find(x => x.roomNumber == _roomNumber);
             RoomInfo roomInfo = roomSet.Find(x => x.users.ContainsKey(client));
-            bool state = roomInfo.ExitRoom(client);
+            bool state = roomInfo.ExitRoom(client, clientSet[client].id);
             if (roomInfo.owner == client)
             {
                 foreach (Socket _client in roomInfo.users.Keys)
@@ -268,7 +268,7 @@ namespace The_Vampire_Server
         }
 
         //Disconnect 시 종료처리
-
+         
         private void ItemListProc(Socket client)
         {
             string path = System.IO.Directory.GetCurrentDirectory() + "/itemset";

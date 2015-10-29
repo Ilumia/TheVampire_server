@@ -30,6 +30,7 @@ build/
 *.pidb
 *.log
 *.scc
+!.itemset
 
 # Temporary file
 *~$*
