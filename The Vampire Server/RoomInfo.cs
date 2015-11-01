@@ -16,6 +16,7 @@ namespace The_Vampire_Server
         public Socket owner;
         public int roomState;   // -1: 시작 전, 0: 게임종료, 1이상의 양수: 진행회차
         public float timer;
+        public float nextNoticeTimer;
         public bool isReadyToStart;
         public Queue<ProcessQueue> processQueue;
 
@@ -31,6 +32,7 @@ namespace The_Vampire_Server
             isPublic = _isPublic;
             roomState = -1;
             timer = 0.0f;
+            nextNoticeTimer = 0.0f;
             isReadyToStart = false;
             processQueue = new Queue<ProcessQueue>();
         }
@@ -46,6 +48,7 @@ namespace The_Vampire_Server
                 if (this.totalNumber == 2)
                 {
                     timer = 10.0f;
+                    nextNoticeTimer = timer - 1.0f; ;
                     isReadyToStart = true;
                     Console.WriteLine("isReadyToStart: " + isReadyToStart);
                 }
@@ -58,6 +61,7 @@ namespace The_Vampire_Server
             bool tt = users.Remove(client);
             totalNumber--;
             timer = 0.0f;
+            nextNoticeTimer = 0.0f;
             isReadyToStart = false;
             RoomInOutNotice(this, clientid, false);
             return true;
@@ -80,11 +84,27 @@ namespace The_Vampire_Server
         }
         public void TimerUpdate()
         {
+            bool isReady = false;
             if (timer > 0.0f)
             {
                 timer -= 0.1f;
+                if (timer > 0.0f)
+                {
+                    if (nextNoticeTimer >= timer)
+                    {
+                        nextNoticeTimer = timer - 1.0f;
+                        double _tmpTimer = Math.Round(nextNoticeTimer);
+                        foreach(Socket _client in users.Keys)
+                        {
+                            Server.GetInstance().SendDataToClient((byte)111, _tmpTimer.ToString(), _client);
+                        }
+                    }
+                } else
+                {
+                    isReady = true;
+                }
             }
-            else
+            if (isReady)
             {
                 if (roomState == -1)
                 {
@@ -104,9 +124,11 @@ namespace The_Vampire_Server
                                 _t = "v";
                             }
                             Server.GetInstance().SendDataToClient((byte)106, _t, pair.Key);
-                            Console.WriteLine("gameStart message!!");
                         }
                         isReadyToStart = false;
+                        roomState = 1;
+                        timer = 15.0f;
+                        nextNoticeTimer = timer - 1.0f;
                     }
                 }
                 else if (roomState == 0)
@@ -115,7 +137,20 @@ namespace The_Vampire_Server
                 }
                 else
                 {
-                    // Now playing
+                    PostProcessing();
+                    roomState++;
+                    timer = 15.0f;
+                    nextNoticeTimer = timer - 1.0f;
+                    string tmpMessage = roomState.ToString();
+                    foreach (Player _player in users.Values)
+                    {
+                        tmpMessage += " " + _player.id;
+                        tmpMessage += " " + _player.hp;
+                    }
+                    foreach (Socket _client in users.Keys)
+                    {
+                        Server.GetInstance().SendDataToClient((109), tmpMessage, _client);
+                    }
                 }
             }
         }

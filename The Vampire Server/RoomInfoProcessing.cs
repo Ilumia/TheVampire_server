@@ -94,7 +94,7 @@ namespace The_Vampire_Server
                 */
             }
         }
-        public void PostProcessing()
+        void PostProcessing()
         {
             PreStateClear();
             while (processQueue.Count > 0)
