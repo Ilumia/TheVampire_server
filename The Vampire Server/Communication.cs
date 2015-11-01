@@ -44,23 +44,23 @@ namespace The_Vampire_Server
         }
         private byte[] CompressToBytes(string data)
         {
-            byte[] _data = Encoding.UTF8.GetBytes(data);
+            byte[] _data = Encoding.Unicode.GetBytes(data);
             return _data;
         }
         private byte[] CompressToBytes(byte[] data)
         {
             string tData = Encoding.Unicode.GetString(data);
-            byte[] _data = Encoding.UTF8.GetBytes(tData);
+            byte[] _data = Encoding.Unicode.GetBytes(tData);
             return _data;
         }
         private string DecompressToUnicode(byte[] data)
         {
-            string _data = Encoding.UTF8.GetString(data);
+            string _data = Encoding.Unicode.GetString(data);
             return _data;
         }
         private byte[] DecompressToBytes(byte[] data)
         {
-            string __data = Encoding.UTF8.GetString(data);
+            string __data = Encoding.Unicode.GetString(data);
             byte[] _data = Encoding.Unicode.GetBytes(__data);
             return _data;
         }
@@ -73,7 +73,13 @@ namespace The_Vampire_Server
             if (clientSet[client].state == ClientState.ONROOM || clientSet[client].state == ClientState.ONGAME)
             {
                 RoomInfo roomInfo = roomSet.Find(x => x.users.ContainsKey(client));
-                RoomExitProc(Encoding.Unicode.GetBytes(roomInfo.roomNumber.ToString()), client);
+                try {
+                    RoomExitProc(Encoding.Unicode.GetBytes(roomInfo.roomNumber.ToString()), client);
+                } catch(Exception e)
+                {
+                    errors += e.Message + "\n";
+                    errors += e.StackTrace + "\n\n";
+                }
                 clientSet[client] = new User(clientSet[client].id, ClientState.ONLOBBY);
                 Console.WriteLine(clientSet[client].id + " is out of room!!!");
             }

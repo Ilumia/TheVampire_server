@@ -15,8 +15,8 @@ namespace The_Vampire_Server
         public Dictionary<Socket, Player> users;
         public Socket owner;
         public int roomState;   // -1: 시작 전, 0: 게임종료, 1이상의 양수: 진행회차
-        public float timer;
-        public float nextNoticeTimer;
+        public decimal timer;
+        public decimal nextNoticeTimer;
         public bool isReadyToStart;
         public Queue<ProcessQueue> processQueue;
 
@@ -31,8 +31,8 @@ namespace The_Vampire_Server
             maximumNumber = _maximumNumber;
             isPublic = _isPublic;
             roomState = -1;
-            timer = 0.0f;
-            nextNoticeTimer = 0.0f;
+            timer = (decimal)0;
+            nextNoticeTimer = (decimal)0;
             isReadyToStart = false;
             processQueue = new Queue<ProcessQueue>();
         }
@@ -45,10 +45,10 @@ namespace The_Vampire_Server
                 this.totalNumber++;
 
                 // Countdown of Game start
-                if (this.totalNumber == 2)
+                if (this.totalNumber == 4)
                 {
-                    timer = 10.0f;
-                    nextNoticeTimer = timer - 1.0f; ;
+                    timer = (decimal)10;
+                    nextNoticeTimer = timer - (decimal)1; ;
                     isReadyToStart = true;
                     Console.WriteLine("isReadyToStart: " + isReadyToStart);
                 }
@@ -59,9 +59,10 @@ namespace The_Vampire_Server
         public bool ExitRoom(Socket client, string clientid)
         {
             bool tt = users.Remove(client);
+            Console.WriteLine("-------------userRemove: " + tt);
             totalNumber--;
-            timer = 0.0f;
-            nextNoticeTimer = 0.0f;
+            timer = (decimal)0;
+            nextNoticeTimer = (decimal)0;
             isReadyToStart = false;
             RoomInOutNotice(this, clientid, false);
             return true;
@@ -85,18 +86,17 @@ namespace The_Vampire_Server
         public void TimerUpdate()
         {
             bool isReady = false;
-            if (timer > 0.0f)
+            if (timer > (decimal)0)
             {
-                timer -= 0.1f;
-                if (timer > 0.0f)
+                timer -= (decimal)0.1;
+                if (timer > (decimal)0)
                 {
                     if (nextNoticeTimer >= timer)
                     {
-                        nextNoticeTimer = timer - 1.0f;
-                        double _tmpTimer = Math.Round(nextNoticeTimer);
+                        nextNoticeTimer = timer - (decimal)1;
                         foreach(Socket _client in users.Keys)
                         {
-                            Server.GetInstance().SendDataToClient((byte)111, _tmpTimer.ToString(), _client);
+                            Server.GetInstance().SendDataToClient((byte)111, timer.ToString(), _client);
                         }
                     }
                 } else
@@ -127,8 +127,8 @@ namespace The_Vampire_Server
                         }
                         isReadyToStart = false;
                         roomState = 1;
-                        timer = 15.0f;
-                        nextNoticeTimer = timer - 1.0f;
+                        timer = (decimal)15;
+                        nextNoticeTimer = timer - (decimal)1;
                     }
                 }
                 else if (roomState == 0)
@@ -139,8 +139,8 @@ namespace The_Vampire_Server
                 {
                     PostProcessing();
                     roomState++;
-                    timer = 15.0f;
-                    nextNoticeTimer = timer - 1.0f;
+                    timer = (decimal)15;
+                    nextNoticeTimer = timer - (decimal)1;
                     string tmpMessage = roomState.ToString();
                     foreach (Player _player in users.Values)
                     {
