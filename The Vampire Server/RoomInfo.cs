@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 
 namespace The_Vampire_Server
 {
-    class RoomInfo
+    partial class RoomInfo
     {
         public int roomNumber;
         private static int nextRoomNumber = 0;
@@ -141,136 +142,19 @@ namespace The_Vampire_Server
             }
             return null;
         }
-
-        // PreProcessing
-        public void CardSubmitted(string data, Socket client)
+        private Socket FindSocketFromID(string id)
         {
-            string[] tmp = data.Split(' ');
-            Player player = users[client];
-            Player target = null;
-            int cardNo = Int32.Parse(tmp[0]);
-            if(tmp.Length == 2) {
-                target = FindPlayerFromID(tmp[1]);
-            }
-            switch (cardNo)
+            return users.Where(x => x.Value.id.Equals(id)).Select(x => x.Key).First();
+        }
+        private string TranslateJob(PlayerJob job)
+        {
+            if (job == PlayerJob.HUNTER)
             {
-                case 30:    // 조사
-                    processQueue.Enqueue(new ProcessQueue(cardNo, player, target));
-                    break;
-                case 31:    // 은폐
-                    users[client].isHiding = true;
-                    break;
-                case 32:    // 통신
-
-                    break;
-                case 33:    // 위장
-                    users[client].isCamouflaging = true;
-                    break;
-                case 34:    // 염탐
-                    target.isObserved.Add(player);
-                    break;
-
-                /* 사용 안함
-                case 35:    // 도청
-                    break;
-                */
-                case 36:    // 파악
-                    users[client].isRealizing = true;
-                    break;
-                case 37:    // 입막음
-                    processQueue.Enqueue(new ProcessQueue(cardNo, player, target));
-                    break;
-                /* 클라이언트에서만 사용
-                case 38:    // 행동 재개
-                    break;
-                */
-                case 60:    // 저격
-                    processQueue.Enqueue(new ProcessQueue(cardNo, player, target));
-                    break;
-                case 61:    // 강타
-                    processQueue.Enqueue(new ProcessQueue(cardNo, player, target));
-                    break;
-                case 62:    // 엄폐
-                    users[client].isConcealing = true;
-                    break;
-                case 63:    // 방어
-                    users[client].isDefencing = true;
-                    break;
-                case 64:    // 응급치료
-                    
-                    break;
-                case 65:    // 교란
-                    users[client].isConfusing = true;
-                    break;
-                case 66:    // 반격
-                    users[client].isCounting = true;
-                    break;
-                case 67:    // 함정
-                    users[client].isTrapping = true;
-                    break;
-                case 68:    // 빠른 몸놀림
-                    users[client].isReattacking = true;
-                    break;
-                case 69:    // 금제
-                    target.isDisabled = true;
-                    break;
-                /* 클라이언트에서만 사용
-                case 70:    // 행동 재개
-                    break;
-                */
+                return "헌터";
+            }else
+            {
+                return "뱀파이어";
             }
-        }
-        public void PostProcessing()
-        {
-            while(processQueue.Count > 0) {
-                ProcessQueue process = processQueue.Dequeue();
-                int randomNumber = Server.GetRandom();
-                switch (process.cardNo)
-                {
-                    case 30:    // 조사
-                        if (process.target.isHiding)
-                        {
-                            // 은폐상태
-                        }
-                        else if (process.target.isCamouflaging)
-                        {
-                            // 위장상태
-                        }
-                        else if (process.user.isObserved.Count > 0)
-                        {
-                            // 염탐상태
-                            process.user.isObserved.Clear();
-                        }
-                        else
-                        {
-
-                        }
-                        break;
-                    case 37:    // 입막음
-                        break;
-                    case 60:    // 저격
-                        break;
-                    case 61:    // 강타
-                        break;
-                }
-            }
-            // 일괄수행 (상태변화)
-        }
-
-
-    }
-    class ProcessQueue {
-        public int cardNo;
-        public Player user;
-        public Player target;
-        public ProcessQueue(int _cardNo, Player _user, Player _target) {
-            cardNo = _cardNo;
-            user = _user;
-            target = _target;
-        }
-        public ProcessQueue(int _cardNo, Player _user) {
-            cardNo = _cardNo;
-            user = _user;
         }
     }
 }

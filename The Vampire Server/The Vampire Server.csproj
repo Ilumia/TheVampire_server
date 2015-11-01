@@ -48,6 +48,7 @@
     <Compile Include="Games.cs" />
     <Compile Include="ItemSetGenerator.cs" />
     <Compile Include="DataManager.cs" />
+    <Compile Include="RoomInfoProcessing.cs" />
     <Compile Include="ServerData.cs" />
     <Compile Include="Processing.cs" />
     <Compile Include="Communication.cs" />
