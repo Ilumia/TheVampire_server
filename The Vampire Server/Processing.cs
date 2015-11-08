@@ -271,7 +271,7 @@ namespace The_Vampire_Server
          
         private void ItemListProc(Socket client)
         {
-            string path = System.IO.Directory.GetCurrentDirectory() + "/itemset";
+            string path = System.IO.Directory.GetCurrentDirectory() + "/.itemset";
             string data = File.ReadAllText(path, Encoding.Default);
             SendDataToClient((byte)119, data, client);
         }

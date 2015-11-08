@@ -33,7 +33,7 @@ namespace The_Vampire_Server
                 Int32.TryParse(tmpNum[2], out informationNum);
                 Int32.TryParse(tmpNum[3], out battleNum);
                 int i = 1;
-                for (; i < abilityNum + 2; i++)
+                for (; i < abilityNum + 1; i++)
                 {
                     string[] tmp = cardSet[i].Split('\t');
                     Ability _ability = new Ability();
@@ -43,7 +43,7 @@ namespace The_Vampire_Server
                     float.TryParse(tmp[4], out _ability.effectFactor);
                     abilitySet.Add(number, _ability);
                 }
-                for (; i < informationNum + abilityNum + 2; i++)
+                for (; i < informationNum + abilityNum + 1; i++)
                 {
                     string[] tmp = cardSet[i].Split('\t');
                     InfoCard _info = new InfoCard();
