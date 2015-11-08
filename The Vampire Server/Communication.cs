@@ -164,6 +164,9 @@ namespace The_Vampire_Server
                         case 'L':
                             DeleteFriendProc(data, _client);
                             break;
+                        case 'M':
+                            CardSubmitProc(data, _client);
+                            break;
 
                         case 'V':
                             ItemListProc(_client);
