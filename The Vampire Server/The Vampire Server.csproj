@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Message.cs" />
     <Compile Include="RoomInfo.cs" />
     <Compile Include="Games.cs" />
     <Compile Include="ItemSetGenerator.cs" />
