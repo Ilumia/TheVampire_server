@@ -22,8 +22,24 @@ namespace The_Vampire_Server
         {
             SendDataToClient(type, Encoding.Unicode.GetBytes(data), client);
         }
-        public void SendDataToClient(byte type, byte[] data, Socket client)
+        public void SendDataToClient(byte type, byte[] _data, Socket client)
         {
+            byte[] data;
+            if (!Encoding.Unicode.GetString(_data).Contains("$s$"))
+            {
+                User user = clientSet[client];
+                byte[] serial = Encoding.Unicode.GetBytes("$s$" + user.nextBufferSerial.ToString());
+                data = new byte[_data.Length + serial.Length];
+                Array.Copy(_data, data, _data.Length);
+                Array.Copy(serial, 0, data, _data.Length, serial.Length);
+                user.bufferSerial.Add(user.nextBufferSerial, new User.socketMessage(type, data));
+                user.nextBufferSerial++;
+            } else
+            {
+                data = _data;
+            }
+
+            //data += Encoding.Unicode.GetBytes("s");
             Message packet = new Message();
             if (!client.Connected)
             {
@@ -168,6 +184,9 @@ namespace The_Vampire_Server
                             CardSubmitProc(data, _client);
                             break;
 
+                        case 'U':
+                            AckProc(data, _client);
+                            break;
                         case 'V':
                             ItemListProc(_client);
                             break;
@@ -211,7 +230,13 @@ namespace The_Vampire_Server
             Socket _client = (Socket)sender;
             Message packet = (Message)e.UserToken;
             //packet.Data = CompressToBytes(packet.Data);
-            _client.Send(packet.DataBuffer);
+            try {
+                _client.Send(packet.DataBuffer);
+            } catch(SocketException e_)
+            {
+                Console.WriteLine(e_.Message);
+                Console.WriteLine(e_.StackTrace);
+            }
 
             IPEndPoint clientIP = _client.RemoteEndPoint as IPEndPoint;
             Console.WriteLine("Send Type: {0}, to: {1}", (char)packet.Type, clientIP);

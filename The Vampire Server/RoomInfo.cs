@@ -53,7 +53,7 @@ namespace The_Vampire_Server
                     Console.WriteLine("isReadyToStart: " + isReadyToStart);
                 }
             }
-            RoomInOutNotice(this, clientid, true);
+            //RoomInOutNotice(this, clientid, true);
             return true;
         }
         public bool ExitRoom(Socket client, string clientid)
@@ -64,11 +64,12 @@ namespace The_Vampire_Server
             timer = (decimal)0;
             nextNoticeTimer = (decimal)0;
             isReadyToStart = false;
-            RoomInOutNotice(this, clientid, false);
+            //RoomInOutNotice(this, clientid, false);
             return true;
         }
         private void RoomInOutNotice(RoomInfo roomInfo, string userID, bool isEnter)
         {
+            /*
             string tmp = "";
             if (isEnter)
             {
@@ -82,6 +83,7 @@ namespace The_Vampire_Server
             {
                 Server.GetInstance().SendDataToClient((byte)110, tmp, client);
             }
+            */
         }
         public void TimerUpdate()
         {
@@ -94,9 +96,13 @@ namespace The_Vampire_Server
                     if (nextNoticeTimer >= timer)
                     {
                         nextNoticeTimer = timer - (decimal)1;
-                        foreach(Socket _client in users.Keys)
+                        try {
+                            foreach (Socket _client in users.Keys)
+                            {
+                                Server.GetInstance().SendDataToClient((byte)111, timer.ToString(), _client);
+                            }
+                        } catch (Exception e)
                         {
-                            Server.GetInstance().SendDataToClient((byte)111, timer.ToString(), _client);
                         }
                     }
                 } else

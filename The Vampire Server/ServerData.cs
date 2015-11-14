@@ -9,12 +9,26 @@ namespace The_Vampire_Server
         public string id;
         public ClientState state;
         public UserItem userItem;
-
+        public Dictionary<int, socketMessage> bufferSerial;
+        public int nextBufferSerial = 0;
+        public int nextBufferDeleteSerial = 0;
+        
+        public class socketMessage
+        {
+            public byte type;
+            public byte[] data;
+            public socketMessage(byte _type, byte[] _data)
+            {
+                type = _type;
+                data = _data;
+            }
+        }
         public User(string _id, ClientState _state)
         {
             id = _id;
             state = _state;
             userItem = new UserItem();
+            bufferSerial = new Dictionary<int, socketMessage>();
         }
         public void SetAllItems()
         {

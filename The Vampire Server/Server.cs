@@ -15,7 +15,7 @@ namespace The_Vampire_Server
         Dictionary<Socket, User> clientSet = new Dictionary<Socket, User>();
         List<RoomInfo> roomSet = new List<RoomInfo>();
         static Item item = new Item();
-        string errors = "";
+        public string errors = "";
 
 
         static void Main(string[] args)
