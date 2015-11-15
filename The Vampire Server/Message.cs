@@ -17,8 +17,14 @@ namespace The_Vampire_Server
             get
             {
                 byte[] temp = new byte[0];
-                temp = new byte[Length - 1];
-                for (int i = 0; i < Length - 1; i++) { temp[i] = data[i + 1]; }
+                try {
+                    temp = new byte[Length - 1];
+                    for (int i = 0; i < Length - 1; i++) { temp[i] = data[i + 1]; }
+                }
+                catch (Exception e)
+                {
+
+                }
                 return temp;
             }
             set { this.data = value; }

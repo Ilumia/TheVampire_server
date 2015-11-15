@@ -18,6 +18,13 @@ namespace The_Vampire_Server
             if (tmp.Length == 2)
             {
                 target = FindPlayerFromID(tmp[1]);
+                Console.WriteLine("//////////////////////\ncardSubmit\nplayer: {0}, target: {1}, cardNo: {2}\n//////////////////",
+                    player.id, target.id, cardNo);
+            }
+            else
+            {
+                Console.WriteLine("//////////////////////\ncardSubmit\nplayer: {0}, cardNo: {1}\n//////////////////", 
+                    player.id, cardNo);
             }
             switch (cardNo)
             {

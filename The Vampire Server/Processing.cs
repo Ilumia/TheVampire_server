@@ -275,7 +275,7 @@ namespace The_Vampire_Server
             if (data.Length == 0)
             {
                 Console.WriteLine("ACKPROC!!!!!!!!!!!!!!!!: good!");
-                int[] tmpKey = new int[1];
+                int[] tmpKey = new int[100];
                 user.bufferSerial.Keys.CopyTo(tmpKey, 0);
                 User.socketMessage tmpMessage = user.bufferSerial[tmpKey[0]];
                 SendDataToClient(tmpMessage.type, tmpMessage.data, client);

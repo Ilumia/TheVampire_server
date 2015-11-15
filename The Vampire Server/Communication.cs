@@ -128,7 +128,6 @@ namespace The_Vampire_Server
             IPEndPoint clientIP = _client.RemoteEndPoint as IPEndPoint;
             if (_client.Connected) {
                 _client.Receive(packet.DataBuffer, packet.Length, SocketFlags.None);
-
                 byte[] data = null;
                 if (packet.Length > 0)
                 {
@@ -185,7 +184,7 @@ namespace The_Vampire_Server
                             break;
 
                         case 'U':
-                            AckProc(data, _client);
+                            //AckProc(data, _client);
                             break;
                         case 'V':
                             ItemListProc(_client);
@@ -207,12 +206,15 @@ namespace The_Vampire_Server
                     errors += _e.StackTrace + "\n\n";
                     Console.WriteLine(_e.Message);
                     Console.WriteLine(_e.StackTrace);
-                    SendDataToClient((byte)122, new byte[0], _client);
+                    //SendDataToClient((byte)122, new byte[0], _client);
                 }
 
-                Console.WriteLine("===================================");
-                Console.WriteLine("Recv Type: {0}, from: {1}", (char)packet.Type, clientIP);
-                Console.WriteLine("Recv Data: {0}", Encoding.Unicode.GetString(data));
+                if ((char)packet.Type != 'U')
+                {
+                    Console.WriteLine("===================================");
+                    Console.WriteLine("Recv Type: {0}, from: {1}", (char)packet.Type, clientIP);
+                    Console.WriteLine("Recv Data: {0}", Encoding.Unicode.GetString(data));
+                }
             }
             else
             {
@@ -224,6 +226,7 @@ namespace The_Vampire_Server
             else {
                 DisconnectProc(_client);
             }
+            Console.WriteLine("recv: " + e.SocketError);
         }
         private void Send_Completed(object sender, SocketAsyncEventArgs e)
         {
@@ -239,6 +242,7 @@ namespace The_Vampire_Server
             }
 
             IPEndPoint clientIP = _client.RemoteEndPoint as IPEndPoint;
+            if((char)packet.Type == 'o') { return; }
             Console.WriteLine("Send Type: {0}, to: {1}", (char)packet.Type, clientIP);
             Console.WriteLine("Send Data: {0}", Encoding.Unicode.GetString(packet.Data));
         }
