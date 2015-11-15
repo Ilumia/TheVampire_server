@@ -226,7 +226,6 @@ namespace The_Vampire_Server
             else {
                 DisconnectProc(_client);
             }
-            Console.WriteLine("recv: " + e.SocketError);
         }
         private void Send_Completed(object sender, SocketAsyncEventArgs e)
         {

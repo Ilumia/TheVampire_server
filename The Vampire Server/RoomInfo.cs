@@ -144,6 +144,10 @@ namespace The_Vampire_Server
                 else
                 {
                     PostProcessing();
+                    if(roomState == 0)
+                    {
+                        return;
+                    }
                     roomState++;
                     timer = (decimal)15;
                     nextNoticeTimer = timer - (decimal)1;

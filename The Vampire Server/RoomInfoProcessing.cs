@@ -338,6 +338,7 @@ namespace The_Vampire_Server
                 }
             }
             PostStateClear();
+            PostGameCheck();
         }
         void PreStateClear()
         {
@@ -372,6 +373,42 @@ namespace The_Vampire_Server
                 player.isDefencing = false;
                 player.isConfusing = false;
                 player.isCounting = false;
+            }
+        }
+        void PostGameCheck()
+        {
+            Player[] players = users.Values.ToArray();
+            int v = 2;
+            int h = 2;
+            bool isGameOver = false;
+            for(int i=0; i<4; i++)
+            {
+                if (players[i].hp < 0)
+                {
+                    if(players[i].job == PlayerJob.VAMPIRE) { v--; }
+                    else if (players[i].job == PlayerJob.HUNTER) { h--; }
+                }
+            }
+            string msg = "";
+            if (h == 0 && v == 0) {
+                msg = "d";
+                isGameOver = true;
+            }
+            else if (v == 0) {
+                msg = "h";
+                isGameOver = true;
+            }
+            else if (h == 0) {
+                msg = "v";
+                isGameOver = true;
+            }
+            if(isGameOver)
+            {
+                roomState = 0;
+                foreach (Socket _client in users.Keys)
+                {
+                    Server.GetInstance().SendDataToClient((byte)112, msg, _client);
+                }
             }
         }
     }
