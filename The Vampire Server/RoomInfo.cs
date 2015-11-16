@@ -38,7 +38,6 @@ namespace The_Vampire_Server
         }
         public bool JoinRoom(Socket client, string clientid)
         {
-            Console.WriteLine(totalNumber);
             if (totalNumber < maximumNumber)
             {
                 users.Add(client, new Player(clientid));
@@ -50,7 +49,6 @@ namespace The_Vampire_Server
                     timer = (decimal)10;
                     nextNoticeTimer = timer - (decimal)1; ;
                     isReadyToStart = true;
-                    Console.WriteLine("isReadyToStart: " + isReadyToStart);
                 }
             }
             //RoomInOutNotice(this, clientid, true);
@@ -59,31 +57,12 @@ namespace The_Vampire_Server
         public bool ExitRoom(Socket client, string clientid)
         {
             bool tt = users.Remove(client);
-            Console.WriteLine("-------------userRemove: " + tt);
             totalNumber--;
             timer = (decimal)0;
             nextNoticeTimer = (decimal)0;
             isReadyToStart = false;
             //RoomInOutNotice(this, clientid, false);
             return true;
-        }
-        private void RoomInOutNotice(RoomInfo roomInfo, string userID, bool isEnter)
-        {
-            /*
-            string tmp = "";
-            if (isEnter)
-            {
-                tmp = "i " + userID;
-            }
-            else
-            {
-                tmp = "o " + userID;
-            }
-            foreach (Socket client in roomInfo.users.Keys)
-            {
-                Server.GetInstance().SendDataToClient((byte)110, tmp, client);
-            }
-            */
         }
         public void TimerUpdate()
         {

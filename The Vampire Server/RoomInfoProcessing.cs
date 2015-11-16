@@ -7,6 +7,32 @@ namespace The_Vampire_Server
 {
     partial class RoomInfo
     {
+        Dictionary<Socket, string> dataStack = new Dictionary<Socket, string>();
+        public void StackUpData(Socket client, string data)
+        {
+            if(!dataStack.ContainsKey(client))
+            {
+                dataStack.Add(client, "");
+            }
+            dataStack[client] += data + "\n";
+        }
+        public void GenerateStackWithTurnInfo(string data)
+        {
+            Dictionary<Socket, string> tmpStack = new Dictionary<Socket, string>();
+            string separator = "\r";
+            string additionalData = separator + data;
+            foreach (KeyValuePair<Socket, string> stack in dataStack)
+            {
+                string tmp = stack.Value + additionalData;
+                tmpStack.Add(stack.Key, tmp);
+            }
+            foreach (KeyValuePair<Socket, string> stack in tmpStack)
+            {
+                Server.GetInstance().SendDataToClient((byte)117, stack.Value, stack.Key);
+            }
+            dataStack.Clear();
+        }
+
         // PreProcessing
         public void CardSubmitted(string data, Socket client)
         {

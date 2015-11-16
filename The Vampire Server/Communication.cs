@@ -22,23 +22,8 @@ namespace The_Vampire_Server
         {
             SendDataToClient(type, Encoding.Unicode.GetBytes(data), client);
         }
-        public void SendDataToClient(byte type, byte[] _data, Socket client)
+        public void SendDataToClient(byte type, byte[] data, Socket client)
         {
-            byte[] data;
-            if (!Encoding.Unicode.GetString(_data).Contains("$s$"))
-            {
-                User user = clientSet[client];
-                byte[] serial = Encoding.Unicode.GetBytes("$s$" + user.nextBufferSerial.ToString());
-                data = new byte[_data.Length + serial.Length];
-                Array.Copy(_data, data, _data.Length);
-                Array.Copy(serial, 0, data, _data.Length, serial.Length);
-                user.bufferSerial.Add(user.nextBufferSerial, new User.socketMessage(type, data));
-                user.nextBufferSerial++;
-            } else
-            {
-                data = _data;
-            }
-
             //data += Encoding.Unicode.GetBytes("s");
             Message packet = new Message();
             if (!client.Connected)

@@ -69,7 +69,7 @@ namespace The_Vampire_Server
                 _data += "t";
             else
                 _data += "f";
-            SendDataToClient((byte)99, Encoding.Unicode.GetBytes(_data), client);
+            //SendDataToClient((byte)99, Encoding.Unicode.GetBytes(_data), client);
             clientSet[client] = new User(clientSet[client].id, ClientState.ONROOM);
             RoomUpdateProc(roomInfo);
         }
@@ -268,23 +268,6 @@ namespace The_Vampire_Server
         }
 
         //Disconnect 시 종료처리
-        private void AckProc(byte[] data, Socket client)
-        {
-            string _data = Encoding.Unicode.GetString(data);
-            User user = clientSet[client];
-            if (data.Length == 0)
-            {
-                Console.WriteLine("ACKPROC!!!!!!!!!!!!!!!!: good!");
-                int[] tmpKey = new int[100];
-                user.bufferSerial.Keys.CopyTo(tmpKey, 0);
-                User.socketMessage tmpMessage = user.bufferSerial[tmpKey[0]];
-                SendDataToClient(tmpMessage.type, tmpMessage.data, client);
-            } else
-            {
-                int ackSerial = Int32.Parse(_data);
-                user.bufferSerial.Remove(ackSerial);
-            }
-        }
         private void ItemListProc(Socket client)
         {
             string path = System.IO.Directory.GetCurrentDirectory() + "/.itemset";

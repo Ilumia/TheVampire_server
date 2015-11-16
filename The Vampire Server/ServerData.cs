@@ -9,9 +9,6 @@ namespace The_Vampire_Server
         public string id;
         public ClientState state;
         public UserItem userItem;
-        public Dictionary<int, socketMessage> bufferSerial;
-        public int nextBufferSerial = 0;
-        public int nextBufferDeleteSerial = 0;
         
         public class socketMessage
         {
@@ -28,7 +25,6 @@ namespace The_Vampire_Server
             id = _id;
             state = _state;
             userItem = new UserItem();
-            bufferSerial = new Dictionary<int, socketMessage>();
         }
         public void SetAllItems()
         {
