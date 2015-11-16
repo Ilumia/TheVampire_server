@@ -442,7 +442,7 @@ namespace The_Vampire_Server
             bool isGameOver = false;
             for(int i=0; i<4; i++)
             {
-                if (players[i].hp < 0)
+                if (players[i].hp <= 0)
                 {
                     if(players[i].job == PlayerJob.VAMPIRE) { v--; }
                     else if (players[i].job == PlayerJob.HUNTER) { h--; }
