@@ -107,7 +107,7 @@ namespace The_Vampire_Server
             this.state = ClientState.ONACCESS;
             item = new UserItem();
             SetAllItems();
-            hp = 5;
+            hp = 10;
             isHiding = false;
             isCamouflaging = false;
             isObserved = new List<Player>();
@@ -128,7 +128,7 @@ namespace The_Vampire_Server
             this.state = state;
             item = new UserItem();
             SetAllItems();
-            hp = 5;
+            hp = 10;
             isHiding = false;
             isCamouflaging = false;
             isObserved = new List<Player>();

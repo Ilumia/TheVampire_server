@@ -26,6 +26,13 @@ namespace The_Vampire_Server
                 string tmp = stack.Value + additionalData;
                 tmpStack.Add(stack.Key, tmp);
             }
+            foreach (Socket c in this.users.Keys)
+            {
+                if(!tmpStack.ContainsKey(c))
+                {
+                    tmpStack.Add(c, "\n" + additionalData);
+                }
+            }
             foreach (KeyValuePair<Socket, string> stack in tmpStack)
             {
                 Server.GetInstance().SendDataToClient((byte)117, stack.Value, stack.Key);
@@ -44,13 +51,6 @@ namespace The_Vampire_Server
             if (tmp.Length == 2)
             {
                 target = FindPlayerFromID(tmp[1]);
-                Console.WriteLine("//////////////////////\ncardSubmit\nplayer: {0}, target: {1}, cardNo: {2}\n//////////////////",
-                    player.id, target.id, cardNo);
-            }
-            else
-            {
-                Console.WriteLine("//////////////////////\ncardSubmit\nplayer: {0}, cardNo: {1}\n//////////////////", 
-                    player.id, cardNo);
             }
             switch (cardNo)
             {
@@ -63,7 +63,8 @@ namespace The_Vampire_Server
                 case 32:    // 통신
                     Player tmpPlayer = users.Where(x => x.Value.job == player.job).Select(x => x.Value).First();
                     message = player.id + "가 " + TranslateJob(player.job) + "만의 통신채널로 자신을 알렸습니다.";
-                    Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(tmpPlayer.id));
+                    //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(tmpPlayer.id));
+                    StackUpData(FindSocketFromID(tmpPlayer.id), message);
                     break;
                 case 33:    // 위장
                     users[client].isCamouflaging = true;
@@ -144,13 +145,15 @@ namespace The_Vampire_Server
                             if (p.target.isHiding) // 은폐상태
                             {
                                 message = p.target.id + "를 조사했으나 실패했습니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                StackUpData(p.userSocket, message);
                                 isCanceled = true;
                             }
                             if (p.target.isCamouflaging) // 위장상태
                             {
                                 message = p.target.id + "를 조사한 결과 그는 " + TranslateJob(p.user.job) + "입니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                StackUpData(p.userSocket, message);
                                 isCanceled = true;
                             }
                             if (!isCanceled)
@@ -158,14 +161,16 @@ namespace The_Vampire_Server
                                 if (Server.GetRandom() > 50)
                                 {
                                     message = p.target.id + "를 조사한 결과 그는 " + TranslateJob(p.target.job) + "입니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    StackUpData(p.userSocket, message);
                                     if (p.user.isObserved.Count > 0) // 염탐상태
                                     {
                                         foreach (Player observer in p.user.isObserved)
                                         {
                                             message = p.user.id + "를 염탐한 결과 그는 " + TranslateJob(p.user.job) +
                                                 "이며 그가 조사에 성공한 " + p.target.id + "는 " + TranslateJob(p.target.job) + "입니다.";
-                                            Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(observer.id));
+                                            //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(observer.id));
+                                            StackUpData(FindSocketFromID(observer.id), message);
                                         }
                                         p.user.isObserved.Clear();
                                         isCanceled = true;
@@ -174,7 +179,8 @@ namespace The_Vampire_Server
                                 else
                                 {
                                     message = p.target.id + "를 조사하는데에 실패했습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    StackUpData(p.userSocket, message);
                                 }
                             }
                         }
@@ -184,7 +190,8 @@ namespace The_Vampire_Server
                         {
                             p.target.isMuted = true;
                             string message = "당신은 입막음당했습니다.\n한 턴간 채팅할 수 없습니다.";
-                            Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                            //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                            StackUpData(p.userSocket, message);
                         }
                         break;
                     // 저격
@@ -197,16 +204,19 @@ namespace The_Vampire_Server
                             {
                                 damage *= 2;
                                 message = "빠른 몸놀림의 효과로 당신의 공격은 두배의 피해를 입힙니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                StackUpData(p.userSocket, message);
                             }
                             if (p.target.isConcealing) // 엄폐상태
                             {
                                 if(Server.GetRandom() > 50)
                                 {
                                     message = p.target.id + "는 엄폐해 당신의 저격을 피했습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    StackUpData(p.userSocket, message);
                                     message = "누군가가 저격을 시도했지만 엄폐해 무사히 피했습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    StackUpData(FindSocketFromID(p.target.id), message);
                                     isCanceled = true;
                                 }
                             }
@@ -230,16 +240,19 @@ namespace The_Vampire_Server
                                 }
                                 newTarget.hp -= damage;
                                 message = p.target.id + "를 저격하고자 하였으나 교란당해 " + newTarget.id + "를 공격하였습니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                StackUpData(p.userSocket, message);
                                 message = "누군가로부터 저격당했습니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(newTarget.id));
+                                //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(newTarget.id));
+                                StackUpData(FindSocketFromID(newTarget.id), message);
                                 isCanceled = true;
                             }
                             if (p.target.isTrapping) // 함정상태
                             {
                                 p.user.isTrapped = 3;
                                 message = p.target.id + "를 저격하던 중 함정에 당했습니다. 3턴간 지속피해를 입습니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                StackUpData(p.userSocket, message);
                             }
                             if (!isCanceled)
                             {
@@ -247,20 +260,25 @@ namespace The_Vampire_Server
                                 {
                                     damage /= 2;
                                     message = p.target.id + "는 당신의 저격을 방어하고 절반의 피해를 입었습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    StackUpData(p.userSocket, message);
                                     message = "누군가로부터 저격당했지만 방어해 절반의 피해만을 입었습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    StackUpData(FindSocketFromID(p.target.id), message);
                                 } else
                                 {
                                     message = p.target.id + "를 성공적으로 저격했습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    StackUpData(p.userSocket, message);
                                     message = "누군가로부터 저격당했습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    StackUpData(FindSocketFromID(p.target.id), message);
                                 }
                                 if (p.target.isRealizing) // 파악상태
                                 {
                                     message = "파악 결과 " + p.user.id + "가 당신을 저격했음을 알아냈습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    StackUpData(FindSocketFromID(p.target.id), message);
                                 }
                                 p.target.hp -= damage;
                             }
@@ -276,16 +294,19 @@ namespace The_Vampire_Server
                             {
                                 damage *= 2;
                                 message = "빠른 몸놀림의 효과로 당신의 공격은 두배의 피해를 입힙니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                StackUpData(p.userSocket, message);
                             }
                             if (p.target.isConcealing) // 엄폐상태
                             {
                                 if (Server.GetRandom() > 50)
                                 {
                                     message = p.target.id + "는 엄폐해 당신의 공격을 피했습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    StackUpData(p.userSocket, message);
                                     message = p.user.id + "가 공격해왔으나 엄폐해 무사히 피했습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    StackUpData(FindSocketFromID(p.target.id), message);
                                     isCanceled = true;
                                 }
                             }
@@ -310,25 +331,30 @@ namespace The_Vampire_Server
                                 }
                                 newTarget.hp -= damage;
                                 message = p.target.id + "를 공격하고자 하였으나 교란당해 " + newTarget.id + "를 공격하였습니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                StackUpData(p.userSocket, message);
                                 message = p.user.id + "로부터 공격당했습니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(newTarget.id));
+                                //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(newTarget.id));
+                                StackUpData(FindSocketFromID(newTarget.id), message);
                                 isCanceled = true;
                             }
                             if (p.target.isCounting) // 반격상태
                             {
                                 p.user.hp -= 10;
                                 message = p.target.id + "를 공격하였으나 반격당해 큰 피해를 입었습니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                StackUpData(p.userSocket, message);
                                 message = p.user.id + "가 공격해왔지만 반격했습니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                StackUpData(FindSocketFromID(p.target.id), message);
                                 isCanceled = true;
                             }
                             if (p.target.isTrapping) // 함정상태
                             {
                                 p.user.isTrapped = 3;
                                 message = p.target.id + "를 공격하던 중 함정에 당했습니다. 3턴간 지속피해를 입습니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                StackUpData(p.userSocket, message);
                             }
                             if (!isCanceled)
                             {
@@ -336,16 +362,20 @@ namespace The_Vampire_Server
                                 {
                                     damage /= 2;
                                     message = p.target.id + "는 당신의 공격을 방어하고 절반의 피해를 입었습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    StackUpData(p.userSocket, message);
                                     message = p.user.id + "로부터 공격당했지만 방어해 절반의 피해만을 입었습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    StackUpData(FindSocketFromID(p.target.id), message);
                                 }
                                 else
                                 {
                                     message = p.target.id + "를 성공적으로 공격했습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                    StackUpData(p.userSocket, message);
                                     message = p.user.id + "로부터 공격당했습니다.";
-                                    Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(p.target.id));
+                                    StackUpData(FindSocketFromID(p.target.id), message);
                                 }
                                 p.target.hp -= damage;
                             }
@@ -357,7 +387,8 @@ namespace The_Vampire_Server
                             {
                                 p.target.isMuted = true;
                                 string message = "당신은 금제당했습니다.\n한 턴간 행동할 수 없습니다.";
-                                Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                //Server.GetInstance().SendDataToClient((byte)108, message, p.userSocket);
+                                StackUpData(p.userSocket, message);
                             }
                         }
                         break;
@@ -373,7 +404,8 @@ namespace The_Vampire_Server
                 if (player.isMuted)
                 {
                     string message = "상태이상 [입막음]이 해제되었습니다.";
-                    Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(player.id));
+                    //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(player.id));
+                    StackUpData(FindSocketFromID(player.id), message);
                     player.isMuted = false;
                 }
                 if (player.isTrapped > 0)
@@ -384,7 +416,8 @@ namespace The_Vampire_Server
                 if (player.isDisabled)
                 {
                     string message = "상태이상 [금제]가 해제되었습니다.";
-                    Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(player.id));
+                    //Server.GetInstance().SendDataToClient((byte)108, message, FindSocketFromID(player.id));
+                    StackUpData(FindSocketFromID(player.id), message);
                     player.isDisabled = false;
                 }
             }

@@ -136,9 +136,10 @@ namespace The_Vampire_Server
                         tmpMessage += " " + _player.id;
                         tmpMessage += " " + _player.hp;
                     }
+                    GenerateStackWithTurnInfo(tmpMessage);
                     foreach (Socket _client in users.Keys)
                     {
-                        Server.GetInstance().SendDataToClient((109), tmpMessage, _client);
+                        //Server.GetInstance().SendDataToClient((byte)109, tmpMessage, _client);
                     }
                 }
             }
