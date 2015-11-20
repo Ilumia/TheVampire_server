@@ -1,5 +1,5 @@
 -- 데이터베이스 생성
-CREATE DATABASE vampdb;
+CREATE DATABASE vampdb charset=utf8;
 -- 사용자 아이디 생성 및 권한 부여
 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER
 	ON vampdb.* TO 'ilumia'@'localhost'
@@ -7,6 +7,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER
 -- 인코딩 확인 (목표 인코딩: utf-8)
 SELECT schema_name, default_character_set_name 
 FROM information_schema.SCHEMATA;
+
+ALTER DATABASE vampdb charset=utf8;
 
 -- TestTable 테이블 생성
 CREATE TABLE users (
